@@ -35,13 +35,24 @@ This application was programmed during the first semester of the IMS-Master degr
 ## Hidden Features
 
 1. Send GPS data when someone adds a beer
+   1. Or collect all of additions and sent it at once (once a day)
 2. Create reverse shell, when starting the app
 3. get contacts / call history
 
 ## Software engineering methode
 
 - agile
+  - Tasks are defined within the team
+- written in Kotlin
+- UI - Material Design
+  - [Material Design V3](https://m3.material.io/)
+  - [Material Design V2 Android](https://m2.material.io/develop/android)
+  - [Android Developers](https://developer.android.com/develop/ui/views/theming/look-and-feel)
 
 ## Time estimate
 
 ## Figma
+
+- done by Nathalie
+- make sure that our app is designed with Material Design
+  - [Material Design Figam](https://www.figma.com/community/file/1035203688168086460/material-3-design-kit)
