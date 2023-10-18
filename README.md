@@ -4,7 +4,7 @@ This application was programmed during the first semester of the IMS-Master degr
 
 ## Logo
 
-<img src="./images/Beerney_Logo.png" alt="Beerney Logo" style="height: 200px; width:200px;"/>
+<img src="./images/Beerney_Logo.png" alt="Beerney Logo" style="zoom:50%;" />
 
 ## Team Members
 
@@ -39,7 +39,7 @@ Thanks to Beerney, every beer adventure will do!
 
 ### Persona
 
-<img src="./images/Alex_Brewster.jpeg" alt="Alex Brewster" style="height: 200px; width:150px;"/>
+<img src="./images/Alex_Brewster.jpeg" alt="Alex Brewster" style="zoom: 20%;" />
 
 - Name: Alex Brewster
 - Age: 28
