@@ -38,7 +38,6 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -62,9 +61,6 @@ fun Preview() {
 
 @Composable
 fun BeerList(beerListViewModel: BeerListViewModel){
-    var selectedBrand by remember { mutableStateOf(beerListViewModel.selectedBrand) }
-    var selectedStartDate by remember { mutableLongStateOf(beerListViewModel.selectedStartDate) }
-    var selectedEndDate by remember { mutableLongStateOf(beerListViewModel.selectedEndDate) }
 
    Column(
        horizontalAlignment = Alignment.CenterHorizontally,
@@ -72,14 +68,11 @@ fun BeerList(beerListViewModel: BeerListViewModel){
            .padding(16.dp)
            .fillMaxWidth()
    ) {
-       SelectBeerBrand(selectedBrand) { newBrand -> selectedBrand = newBrand }
+       SelectBeerBrand(beerListViewModel)
        SelectCity(beerListViewModel)
        Spacer(modifier = Modifier.height(8.dp))
        GetStartAndEndDate(
-           startDateMillis = selectedStartDate,
-           endDateMillis = selectedEndDate,
-           onStartDateChanged = { newStartDate -> selectedStartDate = newStartDate },
-           onEndDateChanged = { newEndDate -> selectedEndDate = newEndDate }
+           beerListViewModel
        )
        Spacer(modifier = Modifier.height(8.dp))
        GetBeerList()
@@ -87,9 +80,9 @@ fun BeerList(beerListViewModel: BeerListViewModel){
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SelectBeerBrand(selectedBrand: String, onBrandChanged: (String) -> Unit) {
+fun SelectBeerBrand(beerListViewModel : BeerListViewModel) {
+    val selectedBrand by beerListViewModel.selectedBrand
     var isExpanded by remember { mutableStateOf(false) }
     val availableBrands = arrayOf("Gösser", "Zipfer", "Murauer", "Puntigamer")
 
@@ -120,7 +113,7 @@ fun SelectBeerBrand(selectedBrand: String, onBrandChanged: (String) -> Unit) {
                         color = Alabaster) },
                     onClick = {
                         isExpanded = false
-                        onBrandChanged(brand)
+                        beerListViewModel.setBrand(brand)
                     }
                 )
             }
@@ -152,20 +145,22 @@ fun SelectCity(beerListViewModel : BeerListViewModel){
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GetStartAndEndDate(
-    startDateMillis: Long,
-    onStartDateChanged: (Long) -> Unit,
-    endDateMillis: Long,
-    onEndDateChanged: (Long) -> Unit
+    beerListViewModel: BeerListViewModel,
 ) {
     val dateTime = LocalDateTime.now()
 
+    val initStartDate by beerListViewModel.selectedStartDate
+    val initEndDate by beerListViewModel.selectedEndDate
+
+
     val dateRangePickerState = remember {
         DateRangePickerState(
-            initialSelectedStartDateMillis = startDateMillis,
+            initialSelectedStartDateMillis = initStartDate,
             initialDisplayedMonthMillis = null,
-            initialSelectedEndDateMillis = endDateMillis,
+            initialSelectedEndDateMillis = initEndDate,
             initialDisplayMode = DisplayMode.Input,
             yearRange = (dateTime.year - 10)..(dateTime.year + 10)
         )
@@ -182,18 +177,20 @@ fun GetStartAndEndDate(
             title = null,
             headline = null,
         )
+
         val selectedStartDate = dateRangePickerState.selectedStartDateMillis
         val selectedEndDate = dateRangePickerState.selectedEndDateMillis
 
         DisposableEffect(selectedStartDate, selectedEndDate) {
             if (selectedStartDate != null) {
-                onStartDateChanged(selectedStartDate)
+                beerListViewModel.setStartDate(selectedStartDate)
             }
             if (selectedEndDate != null) {
-                onEndDateChanged(selectedEndDate)
+                beerListViewModel.setEndDate(selectedEndDate)
             }
             onDispose { }
         }
+
 
     }
 }
