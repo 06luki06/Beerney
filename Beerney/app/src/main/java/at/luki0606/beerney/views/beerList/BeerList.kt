@@ -1,4 +1,6 @@
-@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class,
+    ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class
+)
 
 package at.luki0606.beerney.views.beerList
 
@@ -7,11 +9,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -42,37 +44,36 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import at.luki0606.beerney.ui.theme.Alabaster
+import at.luki0606.beerney.ui.theme.DarkRed
 import at.luki0606.beerney.ui.theme.EarthYellow
 import at.luki0606.beerney.ui.theme.Ebony
+import at.luki0606.beerney.viewModels.beerList.BeerListViewModel
 import java.time.LocalDateTime
 import java.time.ZoneId
 
 @Preview(showBackground = true)
 @Composable
 fun Preview() {
-    BeerList()
+    GetBeerList()
 }
 
 @Composable
-fun BeerList(){
-    var city by remember { mutableStateOf("") }
-    var selectedBrand by remember { mutableStateOf("") }
-    var selectedStartDate by remember { mutableLongStateOf(LocalDateTime.now().toMillis()) }
-    var selectedEndDate by remember { mutableLongStateOf(LocalDateTime.now().toMillis()) }
+fun BeerList(beerListViewModel: BeerListViewModel){
+    var selectedBrand by remember { mutableStateOf(beerListViewModel.selectedBrand) }
+    var selectedStartDate by remember { mutableLongStateOf(beerListViewModel.selectedStartDate) }
+    var selectedEndDate by remember { mutableLongStateOf(beerListViewModel.selectedEndDate) }
 
    Column(
-       verticalArrangement = Arrangement.Center,
        horizontalAlignment = Alignment.CenterHorizontally,
        modifier = Modifier
            .padding(16.dp)
+           .fillMaxWidth()
    ) {
-       Dropdown(selectedBrand) { newBrand -> selectedBrand = newBrand }
-       Spacer(modifier = Modifier.height(4.dp))
-       SelectCity(city) { newCity -> city = newCity }
+       SelectBeerBrand(selectedBrand) { newBrand -> selectedBrand = newBrand }
+       SelectCity(beerListViewModel)
        Spacer(modifier = Modifier.height(8.dp))
        GetStartAndEndDate(
            startDateMillis = selectedStartDate,
@@ -80,15 +81,15 @@ fun BeerList(){
            onStartDateChanged = { newStartDate -> selectedStartDate = newStartDate },
            onEndDateChanged = { newEndDate -> selectedEndDate = newEndDate }
        )
-       Spacer(modifier = Modifier.height(4.dp))
+       Spacer(modifier = Modifier.height(8.dp))
        GetBeerList()
-       Spacer(modifier = Modifier.height(4.dp))
-
    }
 }
 
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Dropdown(selectedBrand: String, onBrandChanged: (String) -> Unit) {
+fun SelectBeerBrand(selectedBrand: String, onBrandChanged: (String) -> Unit) {
     var isExpanded by remember { mutableStateOf(false) }
     val availableBrands = arrayOf("Gösser", "Zipfer", "Murauer", "Puntigamer")
 
@@ -100,7 +101,6 @@ fun Dropdown(selectedBrand: String, onBrandChanged: (String) -> Unit) {
             value = selectedBrand.ifEmpty {
                 availableBrands[0]
             },
-
             onValueChange = {},
             readOnly = true,
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded) },
@@ -129,14 +129,15 @@ fun Dropdown(selectedBrand: String, onBrandChanged: (String) -> Unit) {
 }
 
 @Composable
-fun SelectCity(city: String, onCityChanged: (String) -> Unit){
+fun SelectCity(beerListViewModel : BeerListViewModel){
+    val city by beerListViewModel.city
     OutlinedTextField(
         value = city,
         label = { Text("City") },
+        singleLine = true,
         leadingIcon = { Icon(imageVector = Icons.Rounded.LocationOn, contentDescription = "Location") },
         placeholder = { Text("Enter city") },
-        onValueChange = {newCity -> onCityChanged(newCity)
-        },
+        onValueChange = { newCity -> beerListViewModel.setCity(newCity) },
         colors = TextFieldDefaults.colors(
             focusedTextColor = Ebony,
             unfocusedTextColor = Ebony,
@@ -178,6 +179,8 @@ fun GetStartAndEndDate(
             state = dateRangePickerState,
             modifier = Modifier
                 .background(Ebony),
+            title = null,
+            headline = null,
         )
         val selectedStartDate = dateRangePickerState.selectedStartDateMillis
         val selectedEndDate = dateRangePickerState.selectedEndDateMillis
@@ -198,26 +201,35 @@ fun GetStartAndEndDate(
 @Composable
 fun GetBeerList(){
     LazyColumn(
-        Modifier.height(300.dp)
-            .fillMaxWidth(),
-    ){
+        modifier = Modifier.fillMaxHeight(),
+        ){
         items(10) {
-            Row {
-                Text(text = "Beer", style = MaterialTheme.typography.displaySmall)
-                Spacer(modifier = Modifier.width(16.dp))
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(4.dp)
+            ) {
+                Text(text = "Beer",
+                    style = MaterialTheme.typography.displaySmall)
                 Column {
-                    Text(text = "Date", style = MaterialTheme.typography.bodySmall)
-                    Text(text = "time", style = MaterialTheme.typography.bodySmall)
-                    Text(text = "City", style = MaterialTheme.typography.bodySmall)
+                    Text(text = "Date",
+                        style = MaterialTheme.typography.bodySmall)
+                    Text(text = "time",
+                        style = MaterialTheme.typography.bodySmall)
+                    Text(text = "City",
+                        style = MaterialTheme.typography.bodySmall)
                 }
-                Spacer(modifier = Modifier.width(16.dp))
                 IconButton(
                     onClick = { /* TODO: Delete beer */},
                     modifier = Modifier
                         .size(24.dp)
-                        .background(Color.Red)
+                        .background(DarkRed, RoundedCornerShape(4.dp))
                 ) {
-                    Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete")
+                    Icon(imageVector = Icons.Default.Delete,
+                        tint = Alabaster,
+                        contentDescription = "Delete")
                 }
             }
             Divider()
