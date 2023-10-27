@@ -13,7 +13,7 @@ private val darkColorScheme = darkColorScheme(
     primary = EarthYellow,
     secondary = Ebony,
     background = Alabaster,
-    surface = Black
+    surface = Black,
 
     /* Other default colors to override
     tertiary
