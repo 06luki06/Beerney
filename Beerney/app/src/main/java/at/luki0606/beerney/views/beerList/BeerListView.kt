@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -66,7 +67,7 @@ fun BeerList(beerListViewModel: BeerListViewModel){
        horizontalAlignment = Alignment.CenterHorizontally,
        modifier = Modifier
            .padding(16.dp)
-           .fillMaxWidth()
+           .fillMaxSize()
    ) {
        SelectBeerBrand(beerListViewModel)
        SelectCity(beerListViewModel)
@@ -74,7 +75,7 @@ fun BeerList(beerListViewModel: BeerListViewModel){
        GetStartAndEndDate(
            beerListViewModel
        )
-       Spacer(modifier = Modifier.height(8.dp))
+       Spacer(modifier = Modifier.height(16.dp))
        GetBeerList()
    }
 }
@@ -98,7 +99,7 @@ fun SelectBeerBrand(beerListViewModel : BeerListViewModel) {
             readOnly = true,
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded) },
             colors = ExposedDropdownMenuDefaults.textFieldColors(),
-            modifier = Modifier.menuAnchor()
+            modifier = Modifier.menuAnchor().fillMaxWidth()
         )
         
         ExposedDropdownMenu(
@@ -127,6 +128,7 @@ fun SelectCity(beerListViewModel : BeerListViewModel){
     OutlinedTextField(
         value = city,
         label = { Text("City") },
+        modifier = Modifier.fillMaxWidth(),
         singleLine = true,
         leadingIcon = { Icon(imageVector = Icons.Rounded.LocationOn, contentDescription = "Location") },
         placeholder = { Text("Enter city") },
@@ -167,7 +169,7 @@ fun GetStartAndEndDate(
     }
 
     Surface(
-        shape = RoundedCornerShape(4.dp),
+        shape = RoundedCornerShape(8.dp),
         modifier = Modifier.fillMaxWidth()
     ) {
         DateRangePicker(
