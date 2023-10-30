@@ -14,6 +14,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Path
+import at.luki0606.beerney.models.CurrentLocation
 import at.luki0606.beerney.ui.theme.Ebony
 import kotlin.math.absoluteValue
 import kotlin.math.cos
@@ -21,15 +22,16 @@ import kotlin.math.min
 import kotlin.math.sin
 
 @Composable
-fun FindHome(currentLocation: Location){
+fun FindHome(){
     var bearing by remember { mutableFloatStateOf(0f) }
+    val currentLocation = CurrentLocation
 
     var targetPosition = Location(LocationManager.GPS_PROVIDER)
 
     targetPosition.latitude = 47.568458
     targetPosition.longitude = 14.866003
 
-    bearing = currentLocation.bearingTo(targetPosition)
+    bearing = currentLocation.getCurrentLocation().bearingTo(targetPosition)
     Text(text = bearing.absoluteValue.toString())
     ArrowComposable(bearing = bearing)
 }
