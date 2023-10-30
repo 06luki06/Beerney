@@ -84,6 +84,7 @@ fun ShowPodium(){
 
 @Composable
 fun PodiumColumn(rank: Int, brand: String, amount: Int) {
+    val context = LocalContext.current
     val boxHeight = when (rank) {
         1 -> 150.dp
         2 -> 100.dp
@@ -108,7 +109,8 @@ fun PodiumColumn(rank: Int, brand: String, amount: Int) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
-            .width(125.dp)
+            //relative to screen width
+            .width(120.dp)
     ) {
         Text(
             text = brand,
@@ -137,7 +139,6 @@ fun PodiumColumn(rank: Int, brand: String, amount: Int) {
         }
     }
 }
-
 @Composable
 fun ShowStatistics(){
     Column {

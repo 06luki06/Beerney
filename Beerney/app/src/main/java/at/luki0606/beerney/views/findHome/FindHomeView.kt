@@ -26,13 +26,23 @@ fun FindHome(){
     var bearing by remember { mutableFloatStateOf(0f) }
     val currentLocation = CurrentLocation
 
-    var targetPosition = Location(LocationManager.GPS_PROVIDER)
+    //create ViewModel to store and calculate everything
 
-    targetPosition.latitude = 47.568458
-    targetPosition.longitude = 14.866003
+    val currentLoc = Location(LocationManager.GPS_PROVIDER)
+    currentLoc.latitude = currentLocation.getLatitude()
+    currentLoc.longitude = currentLocation.getLongitude()
 
-    bearing = currentLocation.getCurrentLocation().bearingTo(targetPosition)
+    //set target position using address in TextField-> reverse geocoding
+    val targetPosition = Location(LocationManager.GPS_PROVIDER)
+    targetPosition.latitude = 47.525709
+    targetPosition.longitude = 14.886129
+
+    bearing = currentLoc.bearingTo(targetPosition)
+
+    //TODO: add rotation sensor to update bearing
+
     Text(text = bearing.absoluteValue.toString())
+
     ArrowComposable(bearing = bearing)
 }
 
@@ -47,7 +57,6 @@ fun ArrowComposable(bearing: Float) {
             val canvasWidth = size.width
             val canvasHeight = size.height
 
-            // Mittelpunkt des Canvas
             val centerX = canvasWidth / 2
             val centerY = canvasHeight / 2
 
@@ -55,10 +64,8 @@ fun ArrowComposable(bearing: Float) {
             val arrowWidth = 20f
             val arrowColor = Ebony
 
-            // Drehung des Pfeils basierend auf dem Bearing
             val arrowRotation = Math.toRadians(90.0 - bearing.toDouble()).toFloat()
 
-            // Pfeilkörper zeichnen
             drawLine(
                 color = arrowColor,
                 start = Offset(centerX, centerY),
@@ -69,9 +76,7 @@ fun ArrowComposable(bearing: Float) {
                 strokeWidth = arrowWidth
             )
 
-            // Pfeilkopf zeichnen
             val headLength = arrowLength * 0.2f
-            val headWidth = arrowWidth * 2
             val headOffsetX = centerX + arrowLength * cos(arrowRotation)
             val headOffsetY = centerY - arrowLength * sin(arrowRotation)
 

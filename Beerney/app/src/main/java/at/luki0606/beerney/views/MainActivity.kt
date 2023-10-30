@@ -38,7 +38,7 @@ import com.google.android.gms.tasks.CancellationTokenSource
 class MainActivity : ComponentActivity() {
     private val beerListViewModel: BeerListViewModel by viewModels()
     private lateinit var fusedLocationClient: FusedLocationProviderClient
-    private lateinit var currentLocation: CurrentLocation
+    private var currentLocation = CurrentLocation
 
     @SuppressLint("MissingPermission")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,7 +64,12 @@ class MainActivity : ComponentActivity() {
                         val result = fusedLocationClient.getCurrentLocation(Priority.PRIORITY_BALANCED_POWER_ACCURACY,
                             CancellationTokenSource().token)
                         result.addOnCompleteListener{
-                            currentLocation.setCurrentLocation(it.result)
+                            //we are getting correct values here - why is app closing afterwards?
+                            val latitude = it.result.latitude
+                            val longitude = it.result.longitude
+
+                            currentLocation.setLatitude(latitude)
+                            currentLocation.setLongitude(longitude)
                         }
                     }else{
                         Toast.makeText(this, "Location is not enabled", Toast.LENGTH_SHORT).show()
@@ -76,8 +81,6 @@ class MainActivity : ComponentActivity() {
         }
 
         locationPermissionRequest.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
-
-
     }
 }
 

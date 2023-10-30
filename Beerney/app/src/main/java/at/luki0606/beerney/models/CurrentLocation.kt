@@ -1,15 +1,22 @@
 package at.luki0606.beerney.models
 
-import android.location.Location
-
 object CurrentLocation {
-    private var currentLocation: Location = Location("")
+    private var currentLatitude: Double = 0.0
+    private var currentLongitude: Double = 0.0
 
-    fun getCurrentLocation(): Location {
-        return currentLocation
+    fun getLatitude(): Double {
+        return currentLatitude
     }
 
-    fun setCurrentLocation(location: Location) {
-        currentLocation = location
+    fun setLatitude(latitude: Double) {
+        currentLatitude = latitude
+    }
+
+    fun getLongitude(): Double {
+        return currentLongitude
+    }
+
+    fun setLongitude(longitude: Double) {
+        currentLongitude = longitude
     }
 }
