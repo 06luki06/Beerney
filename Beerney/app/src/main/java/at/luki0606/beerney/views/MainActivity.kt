@@ -2,8 +2,10 @@ package at.luki0606.beerney.views
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.location.LocationManager
 import android.os.Bundle
+import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -22,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.core.location.LocationManagerCompat.isLocationEnabled
 import at.luki0606.beerney.models.CurrentLocation
+import at.luki0606.beerney.models.CurrentLocationManager
 import at.luki0606.beerney.ui.theme.Alabaster
 import at.luki0606.beerney.ui.theme.BeerneyTheme
 import at.luki0606.beerney.viewModels.beerList.BeerListViewModel
@@ -31,56 +34,86 @@ import at.luki0606.beerney.views.findHome.FindHome
 import at.luki0606.beerney.views.navigation.NavigationBar
 import at.luki0606.beerney.views.statistics.Statistics
 import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
-import com.google.android.gms.location.Priority
-import com.google.android.gms.tasks.CancellationTokenSource
+import kotlin.properties.Delegates
 
 class MainActivity : ComponentActivity() {
     private val beerListViewModel: BeerListViewModel by viewModels()
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private var currentLocation = CurrentLocation
+    private lateinit var currentLocationManager: CurrentLocationManager
+    private var arePermissionsEnabled by Delegates.notNull<Boolean>()
 
     @SuppressLint("MissingPermission")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        currentLocationManager = CurrentLocationManager(this, calculateCurrentPositionCallback)
 
         setContent {
             BeerneyTheme {
                 BuildView(beerListViewModel)
             }
         }
+    }
 
-        //only available in ComponentActivity
-        val locationPermissionRequest = registerForActivityResult(
-            ActivityResultContracts.RequestMultiplePermissions()
-        ){ permissions ->
-            when {
-                permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) ||
-                        permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
-                            Toast.makeText(this, "Location permission granted", Toast.LENGTH_SHORT).show()
-                    if(isLocationEnabled(getSystemService(LOCATION_SERVICE) as LocationManager)){
-                        val result = fusedLocationClient.getCurrentLocation(Priority.PRIORITY_BALANCED_POWER_ACCURACY,
-                            CancellationTokenSource().token)
-                        result.addOnCompleteListener{
-                            //we are getting correct values here - why is app closing afterwards?
-                            val latitude = it.result.latitude
-                            val longitude = it.result.longitude
-
-                            currentLocation.setLatitude(latitude)
-                            currentLocation.setLongitude(longitude)
-                        }
-                    }else{
-                        Toast.makeText(this, "Location is not enabled", Toast.LENGTH_SHORT).show()
-                    }
-                }else -> {
-                    Toast.makeText(this, "Location permission denied", Toast.LENGTH_SHORT).show()
+    private val locationPermissionRequest = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        when {
+            permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) ||
+                    permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
+                Toast.makeText(this, "Location permission granted", Toast.LENGTH_SHORT).show()
+                if (isLocationEnabled(getSystemService(LOCATION_SERVICE) as LocationManager)) {
+                    arePermissionsEnabled = true
+                    currentLocationManager.startLocationUpdates(this)
+                } else {
+                    Toast.makeText(this, "GPS is not enabled", Toast.LENGTH_SHORT).show()
+                    arePermissionsEnabled = false
+                    val settingsIntent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+                    startActivity(settingsIntent)
                 }
             }
+            else -> {
+                Toast.makeText(this, "Location permission denied", Toast.LENGTH_SHORT).show()
+                arePermissionsEnabled = false
+            }
         }
+    }
 
-        locationPermissionRequest.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
+    private val calculateCurrentPositionCallback = object : LocationCallback() {
+        override fun onLocationResult(locationResult: LocationResult) {
+            super.onLocationResult(locationResult)
+            locationResult.lastLocation?.let { location ->
+                Toast.makeText(
+                    this@MainActivity,
+                    "Current location: ${location.latitude}, ${location.longitude}",
+                    Toast.LENGTH_SHORT
+                ).show()
+                currentLocation.setLatitude(location.latitude)
+                currentLocation.setLongitude(location.longitude)
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        locationPermissionRequest.launch(
+            arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            )
+        )
+    }
+
+    override fun onPause() {
+        super.onPause()
+        if (arePermissionsEnabled) {
+            currentLocationManager.stopLocationUpdates()
+        }
     }
 }
 
