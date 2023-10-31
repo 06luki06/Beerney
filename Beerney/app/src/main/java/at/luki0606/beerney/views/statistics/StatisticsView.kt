@@ -108,7 +108,8 @@ fun PodiumColumn(rank: Int, brand: String, amount: Int) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
-            .width(125.dp)
+            //relative to screen width
+            .width(120.dp)
     ) {
         Text(
             text = brand,
@@ -137,7 +138,6 @@ fun PodiumColumn(rank: Int, brand: String, amount: Int) {
         }
     }
 }
-
 @Composable
 fun ShowStatistics(){
     Column {
