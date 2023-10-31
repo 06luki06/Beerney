@@ -84,7 +84,6 @@ fun ShowPodium(){
 
 @Composable
 fun PodiumColumn(rank: Int, brand: String, amount: Int) {
-    val context = LocalContext.current
     val boxHeight = when (rank) {
         1 -> 150.dp
         2 -> 100.dp

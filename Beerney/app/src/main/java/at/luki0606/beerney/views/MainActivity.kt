@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.location.LocationManager
+import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.widget.Toast
@@ -24,10 +25,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.core.location.LocationManagerCompat.isLocationEnabled
 import at.luki0606.beerney.models.CurrentLocation
-import at.luki0606.beerney.models.CurrentLocationManager
+import at.luki0606.beerney.services.CurrentLocationManager
 import at.luki0606.beerney.ui.theme.Alabaster
 import at.luki0606.beerney.ui.theme.BeerneyTheme
 import at.luki0606.beerney.viewModels.beerList.BeerListViewModel
+import at.luki0606.beerney.viewModels.findHome.FindHomeViewModel
 import at.luki0606.beerney.views.beerList.BeerList
 import at.luki0606.beerney.views.beerMap.BeerMap
 import at.luki0606.beerney.views.findHome.FindHome
@@ -41,6 +43,7 @@ import kotlin.properties.Delegates
 
 class MainActivity : ComponentActivity() {
     private val beerListViewModel: BeerListViewModel by viewModels()
+    private val findHomeViewModel: FindHomeViewModel by viewModels()
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private var currentLocation = CurrentLocation
     private lateinit var currentLocationManager: CurrentLocationManager
@@ -50,12 +53,17 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        if(Build.VERSION.SDK_INT < 33){
+            Toast.makeText(this, "This app requires Android 12 or higher", Toast.LENGTH_LONG).show()
+            finish()
+        }
+
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         currentLocationManager = CurrentLocationManager(this, calculateCurrentPositionCallback)
 
         setContent {
             BeerneyTheme {
-                BuildView(beerListViewModel)
+                BuildView(beerListViewModel, findHomeViewModel)
             }
         }
     }
@@ -88,13 +96,7 @@ class MainActivity : ComponentActivity() {
         override fun onLocationResult(locationResult: LocationResult) {
             super.onLocationResult(locationResult)
             locationResult.lastLocation?.let { location ->
-                Toast.makeText(
-                    this@MainActivity,
-                    "Current location: ${location.latitude}, ${location.longitude}",
-                    Toast.LENGTH_SHORT
-                ).show()
-                currentLocation.setLatitude(location.latitude)
-                currentLocation.setLongitude(location.longitude)
+                currentLocation.updateLocation(location.latitude, location.longitude)
             }
         }
     }
@@ -118,7 +120,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun BuildView(beerListViewModel: BeerListViewModel){
+fun BuildView(beerListViewModel: BeerListViewModel, findHomeViewModel: FindHomeViewModel){
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -135,7 +137,7 @@ fun BuildView(beerListViewModel: BeerListViewModel){
                 0 -> BeerMap()
                 1 -> BeerList(beerListViewModel)
                 2 -> Statistics()
-                3 -> FindHome()
+                3 -> FindHome(findHomeViewModel)
                 else -> BeerMap()
             }
         }

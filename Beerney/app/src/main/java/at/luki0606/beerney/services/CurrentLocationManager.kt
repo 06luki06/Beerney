@@ -1,4 +1,4 @@
-package at.luki0606.beerney.models
+package at.luki0606.beerney.services
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -7,21 +7,19 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.LocationSettingsRequest
 import com.google.android.gms.location.Priority
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 
 class CurrentLocationManager(context: Context, private val locationCallback: LocationCallback) {
 
     private val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
-    private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
     private val locationRequest = LocationRequest.Builder(
         Priority.PRIORITY_BALANCED_POWER_ACCURACY,
-        2500
+        5000,
     ).build()
 
     @SuppressLint("MissingPermission")
     fun startLocationUpdates(context: Context){
+
         val locationSettingsRequest = LocationSettingsRequest.Builder()
             .addLocationRequest(locationRequest)
             .build()

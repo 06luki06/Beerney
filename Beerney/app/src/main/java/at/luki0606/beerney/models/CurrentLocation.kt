@@ -1,22 +1,23 @@
 package at.luki0606.beerney.models
 
-object CurrentLocation {
-    private var currentLatitude: Double = 0.0
-    private var currentLongitude: Double = 0.0
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
-    fun getLatitude(): Double {
-        return currentLatitude
+object CurrentLocation {
+    private val _location = MutableStateFlow(LocationData(0.0, 0.0))
+    val location: StateFlow<LocationData> = _location
+
+    fun updateLocation(latitude: Double, longitude: Double) {
+        _location.value = LocationData(latitude, longitude)
     }
 
-    fun setLatitude(latitude: Double) {
-        currentLatitude = latitude
+    fun getLatitude(): Double {
+        return _location.value.latitude
     }
 
     fun getLongitude(): Double {
-        return currentLongitude
-    }
-
-    fun setLongitude(longitude: Double) {
-        currentLongitude = longitude
+        return _location.value.longitude
     }
 }
+
+data class LocationData(val latitude: Double, val longitude: Double)
