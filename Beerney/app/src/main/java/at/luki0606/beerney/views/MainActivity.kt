@@ -73,8 +73,8 @@ class MainActivity : ComponentActivity() {
     ) { permissions ->
         when {
             permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) ||
-                    permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
-                Toast.makeText(this, "Location permission granted", Toast.LENGTH_SHORT).show()
+            permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) ->{
+                Toast.makeText(this, "Permissions granted", Toast.LENGTH_SHORT).show()
                 if (isLocationEnabled(getSystemService(LOCATION_SERVICE) as LocationManager)) {
                     arePermissionsEnabled = true
                     currentLocationManager.startLocationUpdates(this)
@@ -86,7 +86,7 @@ class MainActivity : ComponentActivity() {
                 }
             }
             else -> {
-                Toast.makeText(this, "Location permission denied", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Permissions denied", Toast.LENGTH_SHORT).show()
                 arePermissionsEnabled = false
             }
         }
