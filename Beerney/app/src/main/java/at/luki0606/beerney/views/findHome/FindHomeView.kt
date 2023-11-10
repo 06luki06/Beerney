@@ -63,11 +63,11 @@ fun FindHome(viewModel: FindHomeViewModel){
         verticalArrangement = Arrangement.SpaceAround,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        ShowLocationValue(key = "Current lat:", value = "${currentLoc.latitude.toString()}°")
-        ShowLocationValue(key = "Current long:", value = "${currentLoc.longitude.toString()}°")
-        ShowLocationValue(key = "Home lat:", value = "${targetPosition.latitude.toString()}°")
-        ShowLocationValue(key = "Home long:", value = "${targetPosition.longitude.toString()}°")
-        ShowLocationValue(key = "Bearing:", value = "${bearing.absoluteValue.toString()}°")
+        ShowLocationValue(key = "Current lat:", value = "${currentLoc.latitude}°")
+        ShowLocationValue(key = "Current long:", value = "${currentLoc.longitude}°")
+        ShowLocationValue(key = "Home lat:", value = "${targetPosition.latitude}°")
+        ShowLocationValue(key = "Home long:", value = "${targetPosition.longitude}°")
+        ShowLocationValue(key = "Bearing:", value = "${bearing.absoluteValue}°")
         EnterAddress(address = address, viewModel = viewModel)
         Spacer(modifier = Modifier.height(25.dp))
         FindHomeBtn(viewModel = viewModel)
@@ -161,7 +161,6 @@ fun EnterAddress(address: String, viewModel: FindHomeViewModel){
 
 @Composable
 fun FindHomeBtn(viewModel: FindHomeViewModel){
-    val bearing by viewModel.bearing
     val address by viewModel.address
     val context = LocalContext.current
     val geocoder = Geocoder(LocalContext.current, Locale.getDefault())
@@ -171,16 +170,17 @@ fun FindHomeBtn(viewModel: FindHomeViewModel){
         enabled = address.isNotEmpty(),
         onClick = {
             if (Build.VERSION.SDK_INT >= 33) {
-                geocoder.getFromLocationName(address, 1, Geocoder.GeocodeListener { addresses ->
+                geocoder.getFromLocationName(address, 1) { addresses ->
                     if (addresses.isNotEmpty()) {
                         viewModel.updateTargetPositionAndBearing(
                             addresses[0].latitude,
                             addresses[0].longitude
                         )
                     } else {
-                        Toast.makeText(context, "Could not found location", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "Could not found location", Toast.LENGTH_SHORT)
+                            .show()
                     }
-                })
+                }
             }
         }
     ) {
