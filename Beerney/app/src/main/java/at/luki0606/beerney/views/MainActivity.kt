@@ -29,6 +29,7 @@ import at.luki0606.beerney.services.CurrentLocationManager
 import at.luki0606.beerney.ui.theme.Alabaster
 import at.luki0606.beerney.ui.theme.BeerneyTheme
 import at.luki0606.beerney.viewModels.beerList.BeerListViewModel
+import at.luki0606.beerney.viewModels.beerMap.BeerMapViewModel
 import at.luki0606.beerney.viewModels.findHome.FindHomeViewModel
 import at.luki0606.beerney.views.beerList.BeerList
 import at.luki0606.beerney.views.beerMap.BeerMap
@@ -44,6 +45,7 @@ import kotlin.properties.Delegates
 class MainActivity : ComponentActivity() {
     private val beerListViewModel: BeerListViewModel by viewModels()
     private val findHomeViewModel: FindHomeViewModel by viewModels()
+    private val beerMapViewModel: BeerMapViewModel by viewModels()
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private var currentLocation = CurrentLocation
     private lateinit var currentLocationManager: CurrentLocationManager
@@ -63,7 +65,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             BeerneyTheme {
-                BuildView(beerListViewModel, findHomeViewModel)
+                BuildView(beerListViewModel, findHomeViewModel, beerMapViewModel)
             }
         }
     }
@@ -120,7 +122,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun BuildView(beerListViewModel: BeerListViewModel, findHomeViewModel: FindHomeViewModel){
+fun BuildView(beerListViewModel: BeerListViewModel, findHomeViewModel: FindHomeViewModel, beerMapViewModel: BeerMapViewModel){
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -134,11 +136,11 @@ fun BuildView(beerListViewModel: BeerListViewModel, findHomeViewModel: FindHomeV
                 .weight(1f)
         ){
             when (selectedIndex) {
-                0 -> BeerMap()
+                0 -> BeerMap(beerMapViewModel)
                 1 -> BeerList(beerListViewModel)
                 2 -> Statistics()
                 3 -> FindHome(findHomeViewModel)
-                else -> BeerMap()
+                else -> BeerMap(beerMapViewModel)
             }
         }
 

@@ -144,7 +144,7 @@ fun EnterAddress(address: String, viewModel: FindHomeViewModel){
         singleLine = true,
         leadingIcon = { Icon(imageVector = Icons.Rounded.Place, contentDescription = "Home-Address") },
         placeholder = { Text("Enter address") },
-        onValueChange = { newAddress -> viewModel.setCity(newAddress) },
+        onValueChange = { newAddress -> viewModel.setAddress(newAddress) },
         colors = TextFieldDefaults.colors(
             focusedTextColor = Ebony,
             unfocusedTextColor = Ebony,

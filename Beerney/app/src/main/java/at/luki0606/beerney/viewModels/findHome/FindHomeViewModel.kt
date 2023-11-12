@@ -24,7 +24,7 @@ class FindHomeViewModel : ViewModel() {
     private val _bearing = mutableFloatStateOf(0f)
     val bearing: State<Float> = _bearing
 
-    fun setCity(newAddress: String) {
+    fun setAddress(newAddress: String) {
         _targetAddress.value = newAddress
     }
 
