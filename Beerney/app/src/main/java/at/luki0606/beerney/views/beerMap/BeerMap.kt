@@ -11,13 +11,20 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import at.luki0606.beerney.ui.theme.Alabaster
 import at.luki0606.beerney.viewModels.beerMap.BeerMapViewModel
@@ -30,6 +37,7 @@ import com.google.maps.android.compose.rememberCameraPositionState
 
 @Composable
 fun BeerMap(viewModel: BeerMapViewModel) {
+    var showDialog by remember { mutableStateOf(false) }
     val currentLocationState = viewModel.currentLocation.collectAsState()
     val currentLocation = LatLng(currentLocationState.value.latitude, currentLocationState.value.longitude)
     val cameraPositionState = rememberCameraPositionState {
@@ -42,6 +50,7 @@ fun BeerMap(viewModel: BeerMapViewModel) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        AddBeer(showDialog = showDialog){ closeDialog -> showDialog = closeDialog}
         GoogleMap(
             cameraPositionState = cameraPositionState,
             modifier = Modifier
@@ -58,7 +67,7 @@ fun BeerMap(viewModel: BeerMapViewModel) {
         Button(
             modifier = Modifier
                 .fillMaxWidth(),
-            onClick = { /*TODO*/ },
+            onClick = { showDialog = true},
         ) {
             Row {
                 Icon(
@@ -72,5 +81,54 @@ fun BeerMap(viewModel: BeerMapViewModel) {
                     color = Alabaster)
             }
         }
+    }
+}
+
+@Composable
+fun AddBeer(showDialog: Boolean, onShowDialogChanged: (Boolean) -> Unit){
+    val context = LocalContext.current
+    var beerName by remember { mutableStateOf("") }
+
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                onShowDialogChanged(false)
+            },
+            title = { Text(text = "Time for Beerney!") },
+            text = {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    TextField(
+                        value = beerName,
+                        onValueChange = {
+                            beerName = it
+                        },
+                        label = { Text("Beer Brand") }
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        onShowDialogChanged(false)
+                    }
+                ) {
+                    Text(text = "Add Beer",
+                        color = Alabaster)
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = {
+                        onShowDialogChanged(false)
+                    }
+                ) {
+                    Text(text = "Cancel",
+                        color = Alabaster)
+                }
+            }
+        )
     }
 }

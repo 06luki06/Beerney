@@ -136,11 +136,11 @@ fun BuildView(beerListViewModel: BeerListViewModel, findHomeViewModel: FindHomeV
                 .weight(1f)
         ){
             when (selectedIndex) {
-                0 -> BeerMap(beerMapViewModel)
-                1 -> BeerList(beerListViewModel)
+                0 -> BeerList(beerListViewModel)
+                1 -> BeerMap(beerMapViewModel)
                 2 -> Statistics()
                 3 -> FindHome(findHomeViewModel)
-                else -> BeerMap(beerMapViewModel)
+                else -> BeerList(beerListViewModel)
             }
         }
 

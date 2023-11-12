@@ -51,15 +51,15 @@ fun NavigationBar(selectedIndex: Int, onIndexChanged: (Int) -> Unit){
         horizontalArrangement = Arrangement.SpaceEvenly
     ){
         NavigationBarItem(
-            icon = Icons.Rounded.Home,
-            contentDesc = "Home",
+            icon = Icons.Rounded.List,
+            contentDesc = "List",
             selected = selectedIndex == 0,
-            ){
+        ){
             onIndexChanged(0)
         }
         NavigationBarItem(
-            icon = Icons.Rounded.List,
-            contentDesc = "List",
+            icon = Icons.Rounded.LocationOn,
+            contentDesc = "Home",
             selected = selectedIndex == 1,
             ){
             onIndexChanged(1)
@@ -72,7 +72,7 @@ fun NavigationBar(selectedIndex: Int, onIndexChanged: (Int) -> Unit){
             onIndexChanged(2)
         }
         NavigationBarItem(
-            icon = Icons.Rounded.LocationOn,
+            icon = Icons.Rounded.Home,
             contentDesc = "FindHome",
             selected = selectedIndex == 3,
             ){
