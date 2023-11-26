@@ -4,7 +4,6 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.location.LocationManager
-import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.widget.Toast
@@ -24,6 +23,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.core.location.LocationManagerCompat.isLocationEnabled
+import at.luki0606.beerney.models.BeerModel
+import at.luki0606.beerney.models.BeerRepository
 import at.luki0606.beerney.models.CurrentLocation
 import at.luki0606.beerney.services.CurrentLocationManager
 import at.luki0606.beerney.ui.theme.Alabaster
@@ -40,6 +41,7 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
+import java.util.Date
 import kotlin.properties.Delegates
 
 class MainActivity : ComponentActivity() {
@@ -55,10 +57,13 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if(Build.VERSION.SDK_INT < 33){
-            Toast.makeText(this, "This app requires Android 12 or higher", Toast.LENGTH_LONG).show()
-            finish()
-        }
+        // Test data
+        BeerRepository.addBeer(BeerModel("Gösser", 47.546196697500996, 14.883664859187075, "Eisenerz", Date()))
+        BeerRepository.addBeer(BeerModel("Gösser", 47.54573495514112, 14.88450903189536, "Eisenerz", Date()))
+        BeerRepository.addBeer(BeerModel("Gösser", 47.54297212274162, 14.885435018449156, "Eisenerz", Date()))
+        BeerRepository.addBeer(BeerModel("Puntigamer", 47.54476761059799, 14.883410332520038, "Eisenerz", Date()))
+        BeerRepository.addBeer(BeerModel("Puntigamer", 47.487975838522765, 14.993305651806542, "Vordernberg", Date()))
+        BeerRepository.addBeer(BeerModel("Schwechater", 47.487836716136655, 14.993875252470868, "Vordernberg", Date()))
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         currentLocationManager = CurrentLocationManager(this, calculateCurrentPositionCallback)

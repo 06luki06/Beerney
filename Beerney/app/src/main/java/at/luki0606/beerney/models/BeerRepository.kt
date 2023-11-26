@@ -1,21 +1,41 @@
 package at.luki0606.beerney.models
 
-import BeerDao
-import BeerTable
-import androidx.annotation.WorkerThread
-import kotlinx.coroutines.flow.Flow
+object BeerRepository {
+    private val beers = mutableListOf<BeerModel>()
 
-class BeerRepository(private val beerDao: BeerDao) {
-
-    val getAllBeer: Flow<List<BeerTable>> = beerDao.getAll()
-
-    @WorkerThread
-    suspend fun  insertBeer(beerTable: BeerTable){
-        beerDao.insert(beerTable)
+    fun addBeer(beer: BeerModel){
+        beers.add(beer)
     }
 
-    @WorkerThread
-    suspend fun  updateBeer(beerTable: BeerTable){
-        beerDao.update(beerTable)
+    fun getBeers(): List<BeerModel>{
+        return beers
     }
+
+    fun getBeer(beerId: Int): BeerModel{
+        return beers[beerId]
+    }
+
+    fun getBeerCount(): Int{
+        return beers.size
+    }
+
+    fun getBeerCount(beerBrand: String): Int{
+        return beers.filter { it.brand == beerBrand }.size
+    }
+
+    fun deleteBeer(beer: BeerModel){
+        beers.remove(beer)
+    }
+
+    fun getBeerBrands(): Array<String>{
+        val beerBrands: MutableList<String> = mutableListOf()
+        beerBrands.add("All")
+        for(beer in beers){
+            if(!beerBrands.contains(beer.brand)){
+                beerBrands.add(beer.brand)
+            }
+        }
+        return beerBrands.toTypedArray()
+    }
+
 }

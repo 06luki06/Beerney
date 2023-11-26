@@ -3,7 +3,6 @@ package at.luki0606.beerney.views.findHome
 import android.location.Geocoder
 import android.location.Location
 import android.location.LocationManager
-import android.os.Build
 import android.widget.Toast
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
@@ -53,8 +52,6 @@ fun FindHome(viewModel: FindHomeViewModel){
     val currentLoc = Location(LocationManager.GPS_PROVIDER)
     currentLoc.latitude = currentLocation.value.latitude
     currentLoc.longitude = currentLocation.value.longitude
-
-    //TODO: add rotation sensor to update bearing - do we want to do this?
 
     Column(
         modifier = Modifier
@@ -169,17 +166,15 @@ fun FindHomeBtn(viewModel: FindHomeViewModel){
         modifier = Modifier.fillMaxWidth(),
         enabled = address.isNotEmpty(),
         onClick = {
-            if (Build.VERSION.SDK_INT >= 33) {
-                geocoder.getFromLocationName(address, 1) { addresses ->
-                    if (addresses.isNotEmpty()) {
-                        viewModel.updateTargetPositionAndBearing(
-                            addresses[0].latitude,
-                            addresses[0].longitude
-                        )
-                    } else {
-                        Toast.makeText(context, "Could not found location", Toast.LENGTH_SHORT)
-                            .show()
-                    }
+            geocoder.getFromLocationName(address, 1) { addresses ->
+                if (addresses.isNotEmpty()) {
+                    viewModel.updateTargetPositionAndBearing(
+                        addresses[0].latitude,
+                        addresses[0].longitude
+                    )
+                } else {
+                    Toast.makeText(context, "Could not found location", Toast.LENGTH_SHORT)
+                        .show()
                 }
             }
         }

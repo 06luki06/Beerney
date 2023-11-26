@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId = "at.luki0606.beerney"
-        minSdk = 29
+        minSdk = 33
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"

@@ -1,5 +1,6 @@
 package at.luki0606.beerney.views.beerMap
 
+import android.location.Geocoder
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -26,6 +27,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import at.luki0606.beerney.models.BeerModel
+import at.luki0606.beerney.models.BeerRepository
 import at.luki0606.beerney.ui.theme.Alabaster
 import at.luki0606.beerney.viewModels.beerMap.BeerMapViewModel
 import com.google.android.gms.maps.model.CameraPosition
@@ -34,11 +37,14 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
+import java.util.Date
+import java.util.Locale
 
 @Composable
 fun BeerMap(viewModel: BeerMapViewModel) {
     var showDialog by remember { mutableStateOf(false) }
     val currentLocationState = viewModel.currentLocation.collectAsState()
+    val geocoder = Geocoder(LocalContext.current, Locale.getDefault())
     val currentLocation = LatLng(currentLocationState.value.latitude, currentLocationState.value.longitude)
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(currentLocation, 15f)
@@ -50,7 +56,7 @@ fun BeerMap(viewModel: BeerMapViewModel) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        AddBeer(showDialog = showDialog){ closeDialog -> showDialog = closeDialog}
+        AddBeer(currentLocation, geocoder, showDialog = showDialog){ closeDialog -> showDialog = closeDialog}
         GoogleMap(
             cameraPositionState = cameraPositionState,
             modifier = Modifier
@@ -85,8 +91,7 @@ fun BeerMap(viewModel: BeerMapViewModel) {
 }
 
 @Composable
-fun AddBeer(showDialog: Boolean, onShowDialogChanged: (Boolean) -> Unit){
-    val context = LocalContext.current
+fun AddBeer(currentLocation: LatLng, geocoder: Geocoder, showDialog: Boolean, onShowDialogChanged: (Boolean) -> Unit){
     var beerName by remember { mutableStateOf("") }
 
     if (showDialog) {
@@ -112,6 +117,23 @@ fun AddBeer(showDialog: Boolean, onShowDialogChanged: (Boolean) -> Unit){
             confirmButton = {
                 Button(
                     onClick = {
+                        var geocoderCity: String
+                        geocoder.getFromLocation(currentLocation.latitude,
+                            currentLocation.longitude, 1){cities ->
+                            geocoderCity = if(cities.isNotEmpty()){
+                                cities[0].locality
+                            } else {
+                                "Unknown"
+                            }
+                            val model = BeerModel(
+                                brand = beerName,
+                                longitude = currentLocation.longitude,
+                                latitude = currentLocation.latitude,
+                                city = geocoderCity,
+                                drunkAt = Date())
+
+                            BeerRepository.addBeer(model)
+                        }
                         onShowDialogChanged(false)
                     }
                 ) {
