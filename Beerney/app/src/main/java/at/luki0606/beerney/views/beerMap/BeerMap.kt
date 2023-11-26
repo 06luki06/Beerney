@@ -31,6 +31,7 @@ import at.luki0606.beerney.models.BeerModel
 import at.luki0606.beerney.models.BeerRepository
 import at.luki0606.beerney.ui.theme.Alabaster
 import at.luki0606.beerney.viewModels.beerMap.BeerMapViewModel
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
@@ -63,9 +64,19 @@ fun BeerMap(viewModel: BeerMapViewModel) {
                 .fillMaxWidth()
                 .height(600.dp)
         ) {
+            viewModel.beerList.value.forEach{ beer ->
+                Marker(
+                    state = MarkerState(position = LatLng(beer.latitude, beer.longitude)),
+                    title = beer.brand,
+                    icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE),
+                    snippet = beer.city,
+                )
+            }
+
             Marker(
                 state = MarkerState(position = currentLocation),
                 title = "Current Location",
+                icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE),
                 snippet = "This is your current location",
             )
         }

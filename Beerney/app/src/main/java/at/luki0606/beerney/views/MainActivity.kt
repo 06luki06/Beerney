@@ -58,12 +58,12 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         // Test data
-        BeerRepository.addBeer(BeerModel("Gösser", 47.546196697500996, 14.883664859187075, "Eisenerz", Date()))
-        BeerRepository.addBeer(BeerModel("Gösser", 47.54573495514112, 14.88450903189536, "Eisenerz", Date()))
-        BeerRepository.addBeer(BeerModel("Gösser", 47.54297212274162, 14.885435018449156, "Eisenerz", Date()))
-        BeerRepository.addBeer(BeerModel("Puntigamer", 47.54476761059799, 14.883410332520038, "Eisenerz", Date()))
-        BeerRepository.addBeer(BeerModel("Puntigamer", 47.487975838522765, 14.993305651806542, "Vordernberg", Date()))
-        BeerRepository.addBeer(BeerModel("Schwechater", 47.487836716136655, 14.993875252470868, "Vordernberg", Date()))
+        BeerRepository.addBeer(BeerModel("Gösser",14.883664859187075,47.546196697500996,"Eisenerz", Date()))
+        BeerRepository.addBeer(BeerModel("Gösser",  14.88450903189536,47.54573495514112,"Eisenerz", Date()))
+        BeerRepository.addBeer(BeerModel("Gösser",  14.885435018449156, 47.54297212274162,"Eisenerz", Date()))
+        BeerRepository.addBeer(BeerModel("Puntigamer",  14.883410332520038, 47.54476761059799,"Eisenerz", Date()))
+        BeerRepository.addBeer(BeerModel("Puntigamer", 14.993305651806542, 47.487975838522765, "Vordernberg", Date()))
+        BeerRepository.addBeer(BeerModel("Schwechater", 14.993875252470868, 47.487836716136655, "Vordernberg", Date()))
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         currentLocationManager = CurrentLocationManager(this, calculateCurrentPositionCallback)
