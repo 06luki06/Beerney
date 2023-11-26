@@ -35,6 +35,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import at.luki0606.beerney.models.BeerRepository
 import at.luki0606.beerney.ui.theme.Alabaster
 import at.luki0606.beerney.ui.theme.Bronze
 import at.luki0606.beerney.ui.theme.Ebony
@@ -60,24 +61,26 @@ fun Statistics(){
 
 @Composable
 fun ShowPodium(){
+    val beerList = BeerRepository.getBeersSortedByBeerCount()
+
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.Bottom,
     ){
         PodiumColumn(
             rank = 2,
-            brand = "Schwechater",
-            amount = 4
+            brand = beerList[1].first,
+            amount = beerList[1].second
         )
         PodiumColumn(
             rank = 1,
-            brand = "Gösser",
-            amount = 5
+            brand = beerList[0].first,
+            amount = beerList[0].second
         )
         PodiumColumn(
             rank = 3,
-            brand = "Puntigamer",
-            amount = 1
+            brand = beerList[2].first,
+            amount = beerList[2].second
         )
     }
 }
@@ -108,7 +111,7 @@ fun PodiumColumn(rank: Int, brand: String, amount: Int) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
-            //relative to screen width
+            // should be relative to screen width
             .width(120.dp)
     ) {
         Text(
@@ -149,10 +152,11 @@ fun ShowStatistics(){
             fontWeight = FontWeight.Bold,
             color = Ebony
         )
-        ShowSingleStatistic(key = "Total beers drunk", value = "10")
-        ShowSingleStatistic(key = "Beers drunk this week", value = "10")
-        ShowSingleStatistic(key = "Favorite location", value = "Eisenerz")
-        ShowSingleStatistic(key = "Avg. beer / day", value = "0.5")
+        ShowSingleStatistic(key = "Total beers drunk", value = BeerRepository.getBeerCount().toString())
+        ShowSingleStatistic(key = "Beers drunk this week", value = BeerRepository.getBeersCountDrunkWithinCurrentWeek().toString())
+        ShowSingleStatistic(key = "Favorite location", value = BeerRepository.getFavoriteDrinkingLocation())
+        //shows infinity
+        ShowSingleStatistic(key = "Avg. beer / day", value = BeerRepository.getAvgBeerPerDay().toString())
     }
 }
 
@@ -179,7 +183,7 @@ fun ShowSingleStatistic(key: String, value: String){
 
 @Composable
 fun ShareStats(){
-    val shareText by remember { mutableStateOf(TextFieldValue("Check out my Beerney stats:\n\nI have drunk 10  \uD83C\uDF7B this week!")) }
+    val shareText by remember { mutableStateOf(TextFieldValue("Check out my Beerney stats:\n\nI have drunk ${BeerRepository.getBeersCountDrunkWithinCurrentWeek()}  \uD83C\uDF7B this week!")) }
     val context = LocalContext.current
     val shareLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
