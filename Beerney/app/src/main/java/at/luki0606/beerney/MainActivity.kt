@@ -1,4 +1,4 @@
-package at.luki0606.beerney.views
+package at.luki0606.beerney
 
 import android.Manifest
 import android.annotation.SuppressLint
