@@ -163,7 +163,7 @@ fun AddBeer(viewModel: BeerMapViewModel, currentLocation: LatLng, geocoder: Geoc
                                         }
                                     }
                             }
-                            
+
                             beerName = ""
                         }
                         onShowDialogChanged(false)
