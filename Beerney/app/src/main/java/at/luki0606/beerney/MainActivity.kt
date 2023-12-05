@@ -2,10 +2,13 @@ package at.luki0606.beerney
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
 import android.location.LocationManager
 import android.os.Bundle
 import android.provider.Settings
+import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -23,9 +26,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.core.location.LocationManagerCompat.isLocationEnabled
-import at.luki0606.beerney.models.BeerModel
-import at.luki0606.beerney.models.BeerRepository
+import androidx.lifecycle.lifecycleScope
 import at.luki0606.beerney.models.CurrentLocation
+import at.luki0606.beerney.models.IpAddress
 import at.luki0606.beerney.services.CurrentLocationManager
 import at.luki0606.beerney.ui.theme.Alabaster
 import at.luki0606.beerney.ui.theme.BeerneyTheme
@@ -36,12 +39,14 @@ import at.luki0606.beerney.views.beerList.BeerList
 import at.luki0606.beerney.views.beerMap.BeerMap
 import at.luki0606.beerney.views.findHome.FindHome
 import at.luki0606.beerney.views.navigation.NavigationBar
-import at.luki0606.beerney.views.statistics.Statistics
+import com.github.kittinunf.fuel.Fuel
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
-import java.util.Date
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.properties.Delegates
 
 class MainActivity : ComponentActivity() {
@@ -56,14 +61,26 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("MissingPermission")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val ipAddress = IpAddress.getIpAddress(this)
 
-        // Test data
-        BeerRepository.addBeer(BeerModel("Gösser",14.883664859187075,47.546196697500996,"Eisenerz", Date()))
-        BeerRepository.addBeer(BeerModel("Gösser",  14.88450903189536,47.54573495514112,"Eisenerz", Date()))
-        BeerRepository.addBeer(BeerModel("Gösser",  14.885435018449156, 47.54297212274162,"Eisenerz", Date()))
-        BeerRepository.addBeer(BeerModel("Puntigamer",  14.883410332520038, 47.54476761059799,"Eisenerz", Date()))
-        BeerRepository.addBeer(BeerModel("Puntigamer", 14.993305651806542, 47.487975838522765, "Vordernberg", Date()))
-        BeerRepository.addBeer(BeerModel("Schwechater", 14.993875252470868, 47.487836716136655, "Vordernberg", Date()))
+        lifecycleScope.launch(Dispatchers.IO){
+            try {
+                val (_, response, _) = Fuel.get("http://${ipAddress}:3000/status")
+                    .responseString()
+
+                withContext(Dispatchers.Main) {
+                    if (response.statusCode == 200) {
+                        Toast.makeText(this@MainActivity, "Connected to server", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(this@MainActivity, "Could not connect to server", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@MainActivity, "Make sure the server is running", Toast.LENGTH_SHORT).show()
+                        showIpInputDialog(this@MainActivity)
+                    }
+                }
+            } catch (e: Exception) {
+                println("Error: $e")
+            }
+        }
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         currentLocationManager = CurrentLocationManager(this, calculateCurrentPositionCallback)
@@ -73,6 +90,20 @@ class MainActivity : ComponentActivity() {
                 BuildView(beerListViewModel, findHomeViewModel, beerMapViewModel)
             }
         }
+    }
+
+    private fun showIpInputDialog(context: Context) {
+        val input = EditText(context)
+        input.hint = "Enter IP-Address"
+
+        AlertDialog.Builder(context)
+            .setTitle("Enter IP-Address")
+            .setView(input)
+            .setPositiveButton("OK") { _, _ ->
+                val ipAddress = input.text.toString()
+                IpAddress.setIpAddress(ipAddress, context)
+            }
+            .show()
     }
 
     private val locationPermissionRequest = registerForActivityResult(
@@ -143,7 +174,7 @@ fun BuildView(beerListViewModel: BeerListViewModel, findHomeViewModel: FindHomeV
             when (selectedIndex) {
                 0 -> BeerList(beerListViewModel)
                 1 -> BeerMap(beerMapViewModel)
-                2 -> Statistics()
+                //2 -> Statistics()
                 3 -> FindHome(findHomeViewModel)
                 else -> BeerList(beerListViewModel)
             }

@@ -4,6 +4,7 @@
 
 package at.luki0606.beerney.views.beerList
 
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -46,6 +47,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import at.luki0606.beerney.models.BeerRepository
 import at.luki0606.beerney.ui.theme.Alabaster
@@ -197,7 +199,7 @@ fun GetStartAndEndDate(
 }
 
 @Composable
-fun GetBeerList(viewModel: BeerListViewModel){
+fun GetBeerList(viewModel: BeerListViewModel, context: Context = LocalContext.current){
     LazyColumn(
         modifier = Modifier.fillMaxHeight(),
     ){
@@ -222,8 +224,7 @@ fun GetBeerList(viewModel: BeerListViewModel){
                 }
                 IconButton(
                     onClick = {
-                        // does not update UI automatically
-                        viewModel.deleteBeer(beer)
+                        viewModel.deleteBeer(beer, context)
                     },
                     modifier = Modifier
                         .size(24.dp)

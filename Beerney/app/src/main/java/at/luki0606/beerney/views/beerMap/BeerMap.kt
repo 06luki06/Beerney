@@ -137,6 +137,7 @@ fun AddBeer(currentLocation: LatLng, geocoder: Geocoder, showDialog: Boolean, on
                                 "Unknown"
                             }
                             val model = BeerModel(
+                                id = 1,
                                 brand = beerName,
                                 longitude = currentLocation.longitude,
                                 latitude = currentLocation.latitude,

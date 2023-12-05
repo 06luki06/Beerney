@@ -1,17 +1,39 @@
 package at.luki0606.beerney.models
 
+import android.content.Context
+import com.github.kittinunf.fuel.Fuel
+import com.github.kittinunf.result.Result
+import com.google.gson.Gson
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.util.Calendar
 import java.util.Date
 
 object BeerRepository {
-    private val beers = mutableListOf<BeerModel>()
+    private var beers = mutableListOf<BeerModel>()
 
     fun addBeer(beer: BeerModel){
         beers.add(beer)
     }
 
-    fun getBeers(): List<BeerModel>{
-        return beers
+    suspend fun getBeers(context: Context): List<BeerModel> = withContext(Dispatchers.IO){
+        val(_, _, result) = Fuel.get("http://${IpAddress.getIpAddress(context)}:3000/beers")
+            .responseString()
+
+        when (result){
+            is Result.Success -> {
+                val jsonString = result.get()
+                beers = Gson().fromJson(jsonString, Array<BeerModel>::class.java).toMutableList()
+            }
+            is Result.Failure -> {
+                println("Error: ${result.getException()}")
+            }
+            else -> {
+                println("Unknown error")
+            }
+        }
+
+        return@withContext beers
     }
 
     fun getBeer(beerId: Int): BeerModel{
