@@ -37,11 +37,11 @@ import at.luki0606.beerney.ui.theme.BeerneyTheme
 import at.luki0606.beerney.viewModels.beerList.BeerListViewModel
 import at.luki0606.beerney.viewModels.beerMap.BeerMapViewModel
 import at.luki0606.beerney.viewModels.findHome.FindHomeViewModel
-import at.luki0606.beerney.views.beerList.BeerList
-import at.luki0606.beerney.views.beerMap.BeerMap
-import at.luki0606.beerney.views.findHome.FindHome
-import at.luki0606.beerney.views.navigation.NavigationBar
-import at.luki0606.beerney.views.statistics.Statistics
+import at.luki0606.beerney.views.beerList.BeerListView
+import at.luki0606.beerney.views.beerMap.BeerMapView
+import at.luki0606.beerney.views.findHome.FindHomeView
+import at.luki0606.beerney.views.navigation.NavigationBarView
+import at.luki0606.beerney.views.statistics.StatisticsView
 import com.github.kittinunf.fuel.Fuel
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
@@ -188,15 +188,15 @@ fun BuildView(context: Context, beerListViewModel: BeerListViewModel, findHomeVi
                 .weight(1f)
         ){
             when (selectedIndex) {
-                0 -> BeerList(beerListViewModel)
-                1 -> BeerMap(beerMapViewModel)
-                2 -> Statistics()
-                3 -> FindHome(findHomeViewModel)
-                else -> BeerList(beerListViewModel)
+                0 -> BeerListView(beerListViewModel)
+                1 -> BeerMapView(beerMapViewModel)
+                2 -> StatisticsView()
+                3 -> FindHomeView(findHomeViewModel)
+                else -> BeerListView(beerListViewModel)
             }
         }
 
-        NavigationBar(selectedIndex){
+        NavigationBarView(selectedIndex){
             newIndex -> selectedIndex = newIndex
         }
     }

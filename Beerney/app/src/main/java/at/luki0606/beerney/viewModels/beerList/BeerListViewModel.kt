@@ -9,11 +9,11 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import at.luki0606.beerney.models.BeerModel
 import at.luki0606.beerney.models.BeerRepository
-import at.luki0606.beerney.views.beerList.toMillis
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.LocalDateTime
+import java.time.ZoneId
 
 class BeerListViewModel(application: Application) : AndroidViewModel(application) {
     private val _city = mutableStateOf("")
@@ -92,7 +92,7 @@ class BeerListViewModel(application: Application) : AndroidViewModel(application
         _filteredBeerList.value = if (cityFilter.isEmpty()) {
             _filteredBeerList.value
         } else {
-            _filteredBeerList.value.filter { it.city == cityFilter }
+            _filteredBeerList.value.filter { it.city.lowercase().startsWith(cityFilter.trim().lowercase()) }
         }
 
         val startDateFilter = _selectedStartDate.longValue
@@ -111,4 +111,6 @@ class BeerListViewModel(application: Application) : AndroidViewModel(application
             _filteredBeerList.value.filter { it.drunkAt.time <= adjustedEndDate }
         }
     }
+
+    private fun LocalDateTime.toMillis() = this.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
 }
