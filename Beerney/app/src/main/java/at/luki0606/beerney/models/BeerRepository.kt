@@ -12,11 +12,45 @@ import java.util.Date
 object BeerRepository {
     private var beers = mutableListOf<BeerModel>()
 
-    fun addBeer(beer: BeerModel){
-        beers.add(beer)
+    suspend fun addBeer(beer: BeerModel, context: Context) = withContext(Dispatchers.IO){
+        val jsonBody = Gson().toJson(beer)
+
+        Fuel.post("http://${IpAddress.getIpAddress(context)}:3000/beers")
+            .header("Content-Type" to "application/json")
+            .body(jsonBody)
+            .response{_, _, result ->
+                when(result){
+                    is Result.Success -> {
+                        println("Beer added")
+                    }
+                    is Result.Failure -> {
+                        println("Error: ${result.getException()}")
+                    }
+                    else -> {
+                        println("Unknown error")
+                    }
+                }
+            }
     }
 
-    suspend fun getBeers(context: Context): List<BeerModel> = withContext(Dispatchers.IO){
+    suspend fun deleteBeer(beerId: Int, context: Context) = withContext(Dispatchers.IO){
+        val(_, _, result) = Fuel.delete("http://${IpAddress.getIpAddress(context)}:3000/beers/$beerId")
+            .responseString()
+
+        when (result){
+            is Result.Success -> {
+                println("Beer deleted")
+            }
+            is Result.Failure -> {
+                println("Error has happened")
+            }
+            else -> {
+                println("Unknown error")
+            }
+        }
+    }
+
+    suspend fun fetchBeers(context: Context) = withContext(Dispatchers.IO){
         val(_, _, result) = Fuel.get("http://${IpAddress.getIpAddress(context)}:3000/beers")
             .responseString()
 
@@ -32,8 +66,10 @@ object BeerRepository {
                 println("Unknown error")
             }
         }
+    }
 
-        return@withContext beers
+    fun getBeers(): List<BeerModel> {
+        return beers
     }
 
     fun getBeer(beerId: Int): BeerModel{
@@ -126,10 +162,6 @@ object BeerRepository {
         val avgBeersPerDay = totalBeers / daysBetween
 
         return avgBeersPerDay.toDouble()
-    }
-
-    fun deleteBeer(beer: BeerModel){
-        beers.remove(beer)
     }
 
     fun getBeerBrands(): Array<String>{

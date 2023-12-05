@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -27,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.core.location.LocationManagerCompat.isLocationEnabled
 import androidx.lifecycle.lifecycleScope
+import at.luki0606.beerney.models.BeerRepository
 import at.luki0606.beerney.models.CurrentLocation
 import at.luki0606.beerney.models.IpAddress
 import at.luki0606.beerney.services.CurrentLocationManager
@@ -61,6 +63,10 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("MissingPermission")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        currentLocationManager = CurrentLocationManager(this, calculateCurrentPositionCallback)
+
         val ipAddress = IpAddress.getIpAddress(this)
 
         lifecycleScope.launch(Dispatchers.IO){
@@ -82,12 +88,9 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-        currentLocationManager = CurrentLocationManager(this, calculateCurrentPositionCallback)
-
         setContent {
             BeerneyTheme {
-                BuildView(beerListViewModel, findHomeViewModel, beerMapViewModel)
+                BuildView(this@MainActivity, beerListViewModel, findHomeViewModel, beerMapViewModel)
             }
         }
     }
@@ -158,7 +161,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun BuildView(beerListViewModel: BeerListViewModel, findHomeViewModel: FindHomeViewModel, beerMapViewModel: BeerMapViewModel){
+fun BuildView(context: Context, beerListViewModel: BeerListViewModel, findHomeViewModel: FindHomeViewModel, beerMapViewModel: BeerMapViewModel){
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -166,6 +169,12 @@ fun BuildView(beerListViewModel: BeerListViewModel, findHomeViewModel: FindHomeV
         horizontalAlignment = Alignment.CenterHorizontally
     ){
         var selectedIndex by remember { mutableIntStateOf(0) }
+
+        LaunchedEffect(selectedIndex){
+            BeerRepository.fetchBeers(context)
+            beerMapViewModel.updateBeerList()
+            beerListViewModel.updateBeerList()
+        }
 
         Box(
             modifier = Modifier
@@ -180,6 +189,8 @@ fun BuildView(beerListViewModel: BeerListViewModel, findHomeViewModel: FindHomeV
             }
         }
 
-        NavigationBar(selectedIndex){newIndex -> selectedIndex = newIndex}
+        NavigationBar(selectedIndex){
+            newIndex -> selectedIndex = newIndex
+        }
     }
 }

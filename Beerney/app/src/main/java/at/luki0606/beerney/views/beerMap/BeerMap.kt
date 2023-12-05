@@ -27,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewModelScope
 import at.luki0606.beerney.models.BeerModel
 import at.luki0606.beerney.models.BeerRepository
 import at.luki0606.beerney.ui.theme.Alabaster
@@ -38,6 +39,7 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
+import kotlinx.coroutines.launch
 import java.util.Date
 import java.util.Locale
 
@@ -57,7 +59,7 @@ fun BeerMap(viewModel: BeerMapViewModel) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        AddBeer(currentLocation, geocoder, showDialog = showDialog){ closeDialog -> showDialog = closeDialog}
+        AddBeer(viewModel, currentLocation, geocoder, showDialog = showDialog){ closeDialog -> showDialog = closeDialog}
         GoogleMap(
             cameraPositionState = cameraPositionState,
             modifier = Modifier
@@ -102,7 +104,7 @@ fun BeerMap(viewModel: BeerMapViewModel) {
 }
 
 @Composable
-fun AddBeer(currentLocation: LatLng, geocoder: Geocoder, showDialog: Boolean, onShowDialogChanged: (Boolean) -> Unit){
+fun AddBeer(viewModel: BeerMapViewModel, currentLocation: LatLng, geocoder: Geocoder, showDialog: Boolean, onShowDialogChanged: (Boolean) -> Unit){
     var beerName by remember { mutableStateOf("") }
 
     if (showDialog) {
@@ -136,6 +138,10 @@ fun AddBeer(currentLocation: LatLng, geocoder: Geocoder, showDialog: Boolean, on
                             } else {
                                 "Unknown"
                             }
+
+                            val brandUntrimmed = beerName
+                            beerName = brandUntrimmed.trim()
+                            
                             val model = BeerModel(
                                 id = 1,
                                 brand = beerName,
@@ -144,7 +150,9 @@ fun AddBeer(currentLocation: LatLng, geocoder: Geocoder, showDialog: Boolean, on
                                 city = geocoderCity,
                                 drunkAt = Date())
 
-                            BeerRepository.addBeer(model)
+                            viewModel.viewModelScope.launch {
+                                BeerRepository.addBeer(model, viewModel.getApplication())
+                            }
                         }
                         onShowDialogChanged(false)
                     }
