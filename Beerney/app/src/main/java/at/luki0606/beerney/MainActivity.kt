@@ -1,12 +1,14 @@
-package at.luki0606.beerney.views
+package at.luki0606.beerney
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
 import android.location.LocationManager
-import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -17,6 +19,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -24,22 +27,29 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.core.location.LocationManagerCompat.isLocationEnabled
+import androidx.lifecycle.lifecycleScope
+import at.luki0606.beerney.models.BeerRepository
 import at.luki0606.beerney.models.CurrentLocation
+import at.luki0606.beerney.models.IpAddress
 import at.luki0606.beerney.services.CurrentLocationManager
 import at.luki0606.beerney.ui.theme.Alabaster
 import at.luki0606.beerney.ui.theme.BeerneyTheme
 import at.luki0606.beerney.viewModels.beerList.BeerListViewModel
 import at.luki0606.beerney.viewModels.beerMap.BeerMapViewModel
 import at.luki0606.beerney.viewModels.findHome.FindHomeViewModel
-import at.luki0606.beerney.views.beerList.BeerList
-import at.luki0606.beerney.views.beerMap.BeerMap
-import at.luki0606.beerney.views.findHome.FindHome
-import at.luki0606.beerney.views.navigation.NavigationBar
-import at.luki0606.beerney.views.statistics.Statistics
+import at.luki0606.beerney.views.beerList.BeerListView
+import at.luki0606.beerney.views.beerMap.BeerMapView
+import at.luki0606.beerney.views.findHome.FindHomeView
+import at.luki0606.beerney.views.navigation.NavigationBarView
+import at.luki0606.beerney.views.statistics.StatisticsView
+import com.github.kittinunf.fuel.Fuel
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.properties.Delegates
 
 class MainActivity : ComponentActivity() {
@@ -55,19 +65,49 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if(Build.VERSION.SDK_INT < 33){
-            Toast.makeText(this, "This app requires Android 12 or higher", Toast.LENGTH_LONG).show()
-            finish()
-        }
-
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         currentLocationManager = CurrentLocationManager(this, calculateCurrentPositionCallback)
 
-        setContent {
-            BeerneyTheme {
-                BuildView(beerListViewModel, findHomeViewModel, beerMapViewModel)
+        val ipAddress = IpAddress.getIpAddress(this)
+
+        lifecycleScope.launch(Dispatchers.IO){
+            try {
+                val (_, response, _) = Fuel.get("http://${ipAddress}:3000/status")
+                    .responseString()
+
+                withContext(Dispatchers.Main) {
+                    if (response.statusCode == 200) {
+                        Toast.makeText(this@MainActivity, "Connected to server", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(this@MainActivity, "Could not connect to server", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@MainActivity, "Make sure the server is running", Toast.LENGTH_SHORT).show()
+                        showIpInputDialog(this@MainActivity)
+                    }
+                }
+            } catch (e: Exception) {
+                println("Error: $e")
             }
         }
+
+        setContent {
+            BeerneyTheme {
+                BuildView(this@MainActivity, beerListViewModel, findHomeViewModel, beerMapViewModel)
+            }
+        }
+    }
+
+    private fun showIpInputDialog(context: Context) {
+        val input = EditText(context)
+        input.hint = "Enter IP-Address"
+
+        AlertDialog.Builder(context)
+            .setTitle("Enter IP-Address")
+            .setView(input)
+            .setPositiveButton("OK") { _, _ ->
+                val ipAddress = input.text.toString()
+                IpAddress.setIpAddress(ipAddress, context)
+            }
+            .show()
     }
 
     private val locationPermissionRequest = registerForActivityResult(
@@ -122,7 +162,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun BuildView(beerListViewModel: BeerListViewModel, findHomeViewModel: FindHomeViewModel, beerMapViewModel: BeerMapViewModel){
+fun BuildView(context: Context, beerListViewModel: BeerListViewModel, findHomeViewModel: FindHomeViewModel, beerMapViewModel: BeerMapViewModel){
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -131,19 +171,33 @@ fun BuildView(beerListViewModel: BeerListViewModel, findHomeViewModel: FindHomeV
     ){
         var selectedIndex by remember { mutableIntStateOf(0) }
 
+        LaunchedEffect(selectedIndex){
+            val couldFetch = BeerRepository.fetchBeers(context)
+            if(couldFetch){
+                beerMapViewModel.updateBeerList()
+                beerListViewModel.updateBeerList()
+            }else{
+                withContext(Dispatchers.Main){
+                    Toast.makeText(context, "Could not fetch beers", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+
         Box(
             modifier = Modifier
                 .weight(1f)
         ){
             when (selectedIndex) {
-                0 -> BeerList(beerListViewModel)
-                1 -> BeerMap(beerMapViewModel)
-                2 -> Statistics()
-                3 -> FindHome(findHomeViewModel)
-                else -> BeerList(beerListViewModel)
+                0 -> BeerListView(beerListViewModel)
+                1 -> BeerMapView(beerMapViewModel)
+                2 -> StatisticsView()
+                3 -> FindHomeView(findHomeViewModel)
+                else -> BeerListView(beerListViewModel)
             }
         }
 
-        NavigationBar(selectedIndex){newIndex -> selectedIndex = newIndex}
+        NavigationBarView(selectedIndex){
+            newIndex -> selectedIndex = newIndex
+        }
     }
 }

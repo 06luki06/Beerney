@@ -9,3 +9,6 @@
 **/.cxx
 **/local.properties
 **/secrets.properties
+**/node_modules
+**/*.db
+**/webserver/apiKey.json
