@@ -12,59 +12,64 @@ import java.util.Date
 object BeerRepository {
     private var beers = mutableListOf<BeerModel>()
 
-    suspend fun addBeer(beer: BeerModel, context: Context) = withContext(Dispatchers.IO){
-        val jsonBody = Gson().toJson(beer)
+    suspend fun addBeer(beer: BeerModel, context: Context): Boolean = withContext(Dispatchers.IO){
+        return@withContext try{
+            val jsonBody = Gson().toJson(beer)
 
-        Fuel.post("http://${IpAddress.getIpAddress(context)}:3000/beers")
-            .header("Content-Type" to "application/json")
-            .body(jsonBody)
-            .response{_, _, result ->
+            val (_, _, result) = Fuel.post("http://${IpAddress.getIpAddress(context)}:3000/beers")
+                .header("Content-Type" to "application/json")
+                .body(jsonBody)
+                .responseString()
+
                 when(result){
                     is Result.Success -> {
-                        println("Beer added")
-                    }
-                    is Result.Failure -> {
-                        println("Error: ${result.getException()}")
+                        true
                     }
                     else -> {
-                        println("Unknown error")
+                        false
                     }
                 }
-            }
-    }
-
-    suspend fun deleteBeer(beerId: Int, context: Context) = withContext(Dispatchers.IO){
-        val(_, _, result) = Fuel.delete("http://${IpAddress.getIpAddress(context)}:3000/beers/$beerId")
-            .responseString()
-
-        when (result){
-            is Result.Success -> {
-                println("Beer deleted")
-            }
-            is Result.Failure -> {
-                println("Error has happened")
-            }
-            else -> {
-                println("Unknown error")
-            }
+        }catch(e: Exception){
+            false
         }
     }
 
-    suspend fun fetchBeers(context: Context) = withContext(Dispatchers.IO){
-        val(_, _, result) = Fuel.get("http://${IpAddress.getIpAddress(context)}:3000/beers")
-            .responseString()
+    suspend fun deleteBeer(beerId: Int, context: Context): Boolean = withContext(Dispatchers.IO) {
+        return@withContext try {
+            val (_, _, result) = Fuel.delete("http://${IpAddress.getIpAddress(context)}:3000/beers/$beerId")
+                .responseString()
 
-        when (result){
-            is Result.Success -> {
-                val jsonString = result.get()
-                beers = Gson().fromJson(jsonString, Array<BeerModel>::class.java).toMutableList()
+            when (result) {
+                is Result.Success -> {
+                    true
+                }
+                else -> {
+                    false
+                }
             }
-            is Result.Failure -> {
-                println("Error: ${result.getException()}")
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+
+    suspend fun fetchBeers(context: Context): Boolean = withContext(Dispatchers.IO){
+        return@withContext try{
+            val(_, _, result) = Fuel.get("http://${IpAddress.getIpAddress(context)}:3000/beers")
+                .responseString()
+
+            when (result){
+                is Result.Success -> {
+                    val jsonString = result.get()
+                    beers = Gson().fromJson(jsonString, Array<BeerModel>::class.java).toMutableList()
+                    true
+                }
+                else -> {
+                    false
+                }
             }
-            else -> {
-                println("Unknown error")
-            }
+        }catch (e: Exception){
+            false
         }
     }
 
@@ -72,16 +77,8 @@ object BeerRepository {
         return beers
     }
 
-    fun getBeer(beerId: Int): BeerModel{
-        return beers[beerId]
-    }
-
     fun getBeerCount(): Int{
         return beers.size
-    }
-
-    fun getBeerCount(beerBrand: String): Int{
-        return beers.filter { it.brand == beerBrand }.size
     }
 
     fun getFavoriteDrinkingLocation(): String {
@@ -156,7 +153,7 @@ object BeerRepository {
 
         val firstBeerDate = beers.minByOrNull { it.drunkAt }?.drunkAt ?: return 0.0
 
-        val daysBetween = ((today.timeInMillis - firstBeerDate.time) / (24 * 60 * 60 * 1000)).toFloat()
+        val daysBetween = ((today.timeInMillis - firstBeerDate.time) / (24 * 60 * 60 * 1000)).toFloat() + 1.0f
 
         val totalBeers = beers.size.toFloat()
         val avgBeersPerDay = totalBeers / daysBetween

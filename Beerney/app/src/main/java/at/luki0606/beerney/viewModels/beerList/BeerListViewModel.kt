@@ -1,6 +1,7 @@
 package at.luki0606.beerney.viewModels.beerList
 
 import android.app.Application
+import android.widget.Toast
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -9,7 +10,9 @@ import androidx.lifecycle.viewModelScope
 import at.luki0606.beerney.models.BeerModel
 import at.luki0606.beerney.models.BeerRepository
 import at.luki0606.beerney.views.beerList.toMillis
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.LocalDateTime
 
 class BeerListViewModel(application: Application) : AndroidViewModel(application) {
@@ -56,9 +59,24 @@ class BeerListViewModel(application: Application) : AndroidViewModel(application
 
     fun deleteBeer(beer: BeerModel){
         viewModelScope.launch {
-            BeerRepository.deleteBeer(beer.id, getApplication())
-            BeerRepository.fetchBeers(getApplication())
-            updateBeerList()
+            val deletionSuccessful = BeerRepository.deleteBeer(beer.id, getApplication())
+            if(deletionSuccessful){
+                val couldFetch = BeerRepository.fetchBeers(getApplication())
+                if(couldFetch){
+                    updateBeerList()
+                }else{
+                    withContext(Dispatchers.Main){
+                        Toast.makeText(getApplication(), "Error fetching beers", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                withContext(Dispatchers.Main){
+                    Toast.makeText(getApplication(), "Beer deleted", Toast.LENGTH_SHORT).show()
+                }
+            }else{
+                withContext(Dispatchers.Main){
+                    Toast.makeText(getApplication(), "Error deleting beer", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
     }
 

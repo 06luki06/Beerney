@@ -41,6 +41,7 @@ import at.luki0606.beerney.views.beerList.BeerList
 import at.luki0606.beerney.views.beerMap.BeerMap
 import at.luki0606.beerney.views.findHome.FindHome
 import at.luki0606.beerney.views.navigation.NavigationBar
+import at.luki0606.beerney.views.statistics.Statistics
 import com.github.kittinunf.fuel.Fuel
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
@@ -171,9 +172,15 @@ fun BuildView(context: Context, beerListViewModel: BeerListViewModel, findHomeVi
         var selectedIndex by remember { mutableIntStateOf(0) }
 
         LaunchedEffect(selectedIndex){
-            BeerRepository.fetchBeers(context)
-            beerMapViewModel.updateBeerList()
-            beerListViewModel.updateBeerList()
+            val couldFetch = BeerRepository.fetchBeers(context)
+            if(couldFetch){
+                beerMapViewModel.updateBeerList()
+                beerListViewModel.updateBeerList()
+            }else{
+                withContext(Dispatchers.Main){
+                    Toast.makeText(context, "Could not fetch beers", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
 
         Box(
@@ -183,7 +190,7 @@ fun BuildView(context: Context, beerListViewModel: BeerListViewModel, findHomeVi
             when (selectedIndex) {
                 0 -> BeerList(beerListViewModel)
                 1 -> BeerMap(beerMapViewModel)
-                //2 -> Statistics()
+                2 -> Statistics()
                 3 -> FindHome(findHomeViewModel)
                 else -> BeerList(beerListViewModel)
             }

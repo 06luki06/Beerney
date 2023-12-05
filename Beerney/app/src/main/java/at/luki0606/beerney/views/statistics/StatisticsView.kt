@@ -87,6 +87,14 @@ fun ShowPodium(){
 
 @Composable
 fun PodiumColumn(rank: Int, brand: String, amount: Int) {
+    var brandIntern = brand
+    var amountIntern = amount.toString()
+
+    if(brand.contains("empty") && amount == 0){
+        brandIntern = ""
+        amountIntern = ""
+    }
+
     val boxHeight = when (rank) {
         1 -> 150.dp
         2 -> 100.dp
@@ -115,13 +123,13 @@ fun PodiumColumn(rank: Int, brand: String, amount: Int) {
             .width(120.dp)
     ) {
         Text(
-            text = brand,
+            text = brandIntern,
             modifier = Modifier
                 .padding(bottom = 8.dp)
                 .align(Alignment.CenterHorizontally),
         )
         Text(
-            text = amount.toString(),
+            text = amountIntern,
             modifier = Modifier
                 .padding(bottom = 8.dp)
                 .align(Alignment.CenterHorizontally),
@@ -183,7 +191,7 @@ fun ShowSingleStatistic(key: String, value: String){
 
 @Composable
 fun ShareStats(){
-    val shareText by remember { mutableStateOf(TextFieldValue("Check out my Beerney stats:\n\nI have drunk ${BeerRepository.getBeersCountDrunkWithinCurrentWeek()}  \uD83C\uDF7B this week!")) }
+    val shareText by remember { mutableStateOf(TextFieldValue("Check out my Beerney stats:\n\nI have drunk ${BeerRepository.getBeerCount().toString()}  \uD83C\uDF7B since I use this app!")) }
     val context = LocalContext.current
     val shareLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {

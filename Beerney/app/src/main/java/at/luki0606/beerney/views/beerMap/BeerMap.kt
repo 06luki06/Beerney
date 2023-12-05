@@ -1,6 +1,7 @@
 package at.luki0606.beerney.views.beerMap
 
 import android.location.Geocoder
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -39,7 +40,9 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.Date
 import java.util.Locale
 
@@ -141,9 +144,9 @@ fun AddBeer(viewModel: BeerMapViewModel, currentLocation: LatLng, geocoder: Geoc
 
                             val brandUntrimmed = beerName
                             beerName = brandUntrimmed.trim()
-                            
+
                             val model = BeerModel(
-                                id = 1,
+                                id = -1,
                                 brand = beerName,
                                 longitude = currentLocation.longitude,
                                 latitude = currentLocation.latitude,
@@ -151,8 +154,17 @@ fun AddBeer(viewModel: BeerMapViewModel, currentLocation: LatLng, geocoder: Geoc
                                 drunkAt = Date())
 
                             viewModel.viewModelScope.launch {
-                                BeerRepository.addBeer(model, viewModel.getApplication())
+                                val couldAddBeer = BeerRepository.addBeer(model, viewModel.getApplication())
+                                    withContext(Dispatchers.Main){
+                                        if(couldAddBeer){
+                                            Toast.makeText(viewModel.getApplication(), "Beer added", Toast.LENGTH_SHORT).show()
+                                        }else{
+                                            Toast.makeText(viewModel.getApplication(), "Error adding beer", Toast.LENGTH_SHORT).show()
+                                        }
+                                    }
                             }
+                            
+                            beerName = ""
                         }
                         onShowDialogChanged(false)
                     }
