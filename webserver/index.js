@@ -53,4 +53,4 @@ app.delete('/beers/:id', (req, res) => {
     res.json({id});
 });
 
-app.listen(port, () => console.log(`Server listening on port ${port}!`));
+app.listen(port, () => console.log(`Server listening!`));
