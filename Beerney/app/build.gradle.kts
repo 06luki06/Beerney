@@ -76,4 +76,5 @@ dependencies {
     implementation("com.github.kittinunf.fuel:fuel:2.3.1")
     implementation("com.google.code.gson:gson:2.9.0")
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
+    implementation("androidx.fragment:fragment-ktx:1.6.2")
 }

@@ -45,6 +45,7 @@ fun BeerMapView(viewModel: BeerMapViewModel) {
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(currentLocation, 15f)
     }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
