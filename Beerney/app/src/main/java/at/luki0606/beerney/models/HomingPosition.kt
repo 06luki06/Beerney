@@ -5,20 +5,19 @@ import android.content.SharedPreferences
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 
-object IpAddress {
-
-    fun getIpAddress(context: Context): String {
+object HomingPosition {
+    fun getHomingPosition(context: Context): String {
         val masterKey = getMasterKey(context)
         val secureSharedPrefs = getSecureSharedPrefs(masterKey, context)
-        return secureSharedPrefs.getString("IP_ADDRESS", null) ?: ""
+        return secureSharedPrefs.getString("HOMING_POSITION", null) ?: ""
     }
 
-    fun setIpAddress(ipAddress: String, context: Context) {
+    fun setHomingPosition(ipAddress: String, context: Context) {
         val masterKey = getMasterKey(context)
         val secureSharedPrefs = getSecureSharedPrefs(masterKey, context)
 
         val editor = secureSharedPrefs.edit()
-        editor.putString("IP_ADDRESS", ipAddress)
+        editor.putString("HOMING_POSITION", ipAddress)
         editor.apply()
     }
 

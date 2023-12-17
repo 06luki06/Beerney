@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Beerney</string>
+    <string name="ip_address">http://10.77.23.5:3000</string>
 </resources>

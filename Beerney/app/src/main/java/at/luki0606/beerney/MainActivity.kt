@@ -2,13 +2,11 @@ package at.luki0606.beerney
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.location.LocationManager
 import android.os.Bundle
 import android.provider.Settings
-import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -30,7 +28,6 @@ import androidx.core.location.LocationManagerCompat.isLocationEnabled
 import androidx.lifecycle.lifecycleScope
 import at.luki0606.beerney.models.BeerRepository
 import at.luki0606.beerney.models.CurrentLocation
-import at.luki0606.beerney.models.IpAddress
 import at.luki0606.beerney.services.CurrentLocationManager
 import at.luki0606.beerney.ui.theme.Alabaster
 import at.luki0606.beerney.ui.theme.BeerneyTheme
@@ -64,15 +61,16 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("MissingPermission")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        BeerRepository.initialize(this)
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         currentLocationManager = CurrentLocationManager(this, calculateCurrentPositionCallback)
 
-        val ipAddress = IpAddress.getIpAddress(this)
+        val ip = getString(R.string.ip_address)
 
         lifecycleScope.launch(Dispatchers.IO){
             try {
-                val (_, response, _) = Fuel.get("http://${ipAddress}:3000/status")
+                val (_, response, _) = Fuel.get("${ip}/status")
                     .responseString()
 
                 withContext(Dispatchers.Main) {
@@ -80,8 +78,7 @@ class MainActivity : ComponentActivity() {
                         Toast.makeText(this@MainActivity, "Connected to server", Toast.LENGTH_SHORT).show()
                     } else {
                         Toast.makeText(this@MainActivity, "Could not connect to server", Toast.LENGTH_SHORT).show()
-                        Toast.makeText(this@MainActivity, "Make sure the server is running", Toast.LENGTH_SHORT).show()
-                        showIpInputDialog(this@MainActivity)
+                        Toast.makeText(this@MainActivity, "Make sure you are within the FH-Joanneum network", Toast.LENGTH_LONG).show()
                     }
                 }
             } catch (e: Exception) {
@@ -94,20 +91,6 @@ class MainActivity : ComponentActivity() {
                 BuildView(this@MainActivity, beerListViewModel, findHomeViewModel, beerMapViewModel)
             }
         }
-    }
-
-    private fun showIpInputDialog(context: Context) {
-        val input = EditText(context)
-        input.hint = "Enter IP-Address"
-
-        AlertDialog.Builder(context)
-            .setTitle("Enter IP-Address")
-            .setView(input)
-            .setPositiveButton("OK") { _, _ ->
-                val ipAddress = input.text.toString()
-                IpAddress.setIpAddress(ipAddress, context)
-            }
-            .show()
     }
 
     private val locationPermissionRequest = registerForActivityResult(
@@ -172,7 +155,7 @@ fun BuildView(context: Context, beerListViewModel: BeerListViewModel, findHomeVi
         var selectedIndex by remember { mutableIntStateOf(0) }
 
         LaunchedEffect(selectedIndex){
-            val couldFetch = BeerRepository.fetchBeers(context)
+            val couldFetch = BeerRepository.fetchBeers()
             if(couldFetch){
                 beerMapViewModel.updateBeerList()
                 beerListViewModel.updateBeerList()

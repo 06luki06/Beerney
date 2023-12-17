@@ -1,6 +1,7 @@
 package at.luki0606.beerney.models
 
 import android.content.Context
+import at.luki0606.beerney.R
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.result.Result
 import com.google.gson.Gson
@@ -11,12 +12,19 @@ import java.util.Date
 
 object BeerRepository {
     private var beers = mutableListOf<BeerModel>()
+    private lateinit var appContext: Context
+    private lateinit var ip: String
 
-    suspend fun addBeer(beer: BeerModel, context: Context): Boolean = withContext(Dispatchers.IO){
+    fun initialize(context: Context){
+        appContext = context.applicationContext
+        ip = appContext.getString(R.string.ip_address)
+    }
+
+    suspend fun addBeer(beer: BeerModel): Boolean = withContext(Dispatchers.IO){
         return@withContext try{
             val jsonBody = Gson().toJson(beer)
 
-            val (_, _, result) = Fuel.post("http://${IpAddress.getIpAddress(context)}:3000/beers")
+            val (_, _, result) = Fuel.post("${ip}/beers")
                 .header("Content-Type" to "application/json")
                 .body(jsonBody)
                 .responseString()
@@ -34,9 +42,9 @@ object BeerRepository {
         }
     }
 
-    suspend fun deleteBeer(beerId: Int, context: Context): Boolean = withContext(Dispatchers.IO) {
+    suspend fun deleteBeer(beerId: Int): Boolean = withContext(Dispatchers.IO) {
         return@withContext try {
-            val (_, _, result) = Fuel.delete("http://${IpAddress.getIpAddress(context)}:3000/beers/$beerId")
+            val (_, _, result) = Fuel.delete("${ip}/beers/$beerId")
                 .responseString()
 
             when (result) {
@@ -53,9 +61,9 @@ object BeerRepository {
     }
 
 
-    suspend fun fetchBeers(context: Context): Boolean = withContext(Dispatchers.IO){
+    suspend fun fetchBeers(): Boolean = withContext(Dispatchers.IO){
         return@withContext try{
-            val(_, _, result) = Fuel.get("http://${IpAddress.getIpAddress(context)}:3000/beers")
+            val(_, _, result) = Fuel.get("${ip}/beers")
                 .responseString()
 
             when (result){

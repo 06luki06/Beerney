@@ -59,9 +59,9 @@ class BeerListViewModel(application: Application) : AndroidViewModel(application
 
     fun deleteBeer(beer: BeerModel){
         viewModelScope.launch {
-            val deletionSuccessful = BeerRepository.deleteBeer(beer.id, getApplication())
+            val deletionSuccessful = BeerRepository.deleteBeer(beer.id)
             if(deletionSuccessful){
-                val couldFetch = BeerRepository.fetchBeers(getApplication())
+                val couldFetch = BeerRepository.fetchBeers()
                 if(couldFetch){
                     updateBeerList()
                 }else{

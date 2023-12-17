@@ -82,7 +82,7 @@ fun AddBeer(viewModel: BeerMapViewModel, currentLocation: LatLng, geocoder: Geoc
                             )
 
                             viewModel.viewModelScope.launch {
-                                val couldAddBeer = BeerRepository.addBeer(model, viewModel.getApplication())
+                                val couldAddBeer = BeerRepository.addBeer(model)
                                 withContext(Dispatchers.Main){
                                     if(couldAddBeer){
                                         Toast.makeText(viewModel.getApplication(), "Beer added", Toast.LENGTH_SHORT).show()
