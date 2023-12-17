@@ -1,9 +1,62 @@
+const express = require('express');
+const sqlite = require('better-sqlite3');
+const fs = require('fs').promises;
+const app = express();
+const port = 3000;
 
-/** 
-* This file has been protected with Shield for JavaScript.
-* Use it for free at https://www.bytehide.com/products/shield-obfuscator/javascript
-* Enhance the security of your applications and automate it with ByteHide's platform.
-*/
-   
-const _0x113c27=_0x3462;(function(_0x1ac0de,_0x416d47){const _0xc9a56c=_0x3462,_0x3d46cd=_0x1ac0de();while(!![]){try{const _0x90bcc5=parseInt(_0xc9a56c(0x82))/0x1+-parseInt(_0xc9a56c(0x89))/0x2*(-parseInt(_0xc9a56c(0x92))/0x3)+-parseInt(_0xc9a56c(0x7d))/0x4+-parseInt(_0xc9a56c(0x94))/0x5*(parseInt(_0xc9a56c(0x7c))/0x6)+-parseInt(_0xc9a56c(0x81))/0x7*(-parseInt(_0xc9a56c(0x91))/0x8)+-parseInt(_0xc9a56c(0x84))/0x9+parseInt(_0xc9a56c(0x85))/0xa*(parseInt(_0xc9a56c(0x7e))/0xb);if(_0x90bcc5===_0x416d47)break;else _0x3d46cd['push'](_0x3d46cd['shift']());}catch(_0x54f0da){_0x3d46cd['push'](_0x3d46cd['shift']());}}}(_0x3909,0xbcc06));function _0x3462(_0xf14122,_0x384c14){const _0x3909e8=_0x3909();return _0x3462=function(_0x346252,_0xe42ee5){_0x346252=_0x346252-0x79;let _0x516de0=_0x3909e8[_0x346252];return _0x516de0;},_0x3462(_0xf14122,_0x384c14);}const express=require(_0x113c27(0x90)),sqlite=require('better-sqlite3'),fs=require('fs')[_0x113c27(0x8f)],app=express(),port=0xbb8,db=new sqlite('database.db'),apiKeyFilePath=_0x113c27(0x86),createBeerTable=db['prepare'](_0x113c27(0x96));createBeerTable[_0x113c27(0x93)](),app[_0x113c27(0x88)]('/status',(_0x14c817,_0x1db7de)=>_0x1db7de['json']({'status':'ok'})),app[_0x113c27(0x88)](_0x113c27(0x8b),(_0x45109b,_0xdf2239)=>{const _0x50758a=_0x113c27,_0x11d8e1=db[_0x50758a(0x98)](_0x50758a(0x80))[_0x50758a(0x79)]();_0xdf2239['json'](_0x11d8e1);}),app['post'](_0x113c27(0x8b),express['json'](),(_0x4f280f,_0xf69121)=>{const _0x140223=_0x113c27,{brand:_0x400a1e,longitude:_0x558076,latitude:_0x4993b3,city:_0x46e9a3,drunkAt:_0x5e11e1}=_0x4f280f[_0x140223(0x8c)];if(!_0x400a1e||!_0x558076||!_0x4993b3||!_0x46e9a3||!_0x5e11e1){_0xf69121['status'](0x190)[_0x140223(0x7b)]({'error':_0x140223(0x87)});return;}const _0x7d9604=db[_0x140223(0x98)]('\x0a\x20\x20\x20\x20\x20\x20\x20\x20INSERT\x20INTO\x20beers\x20(brand,\x20longitude,\x20latitude,\x20city,\x20drunkAt)\x0a\x20\x20\x20\x20\x20\x20\x20\x20VALUES\x20(?,\x20?,\x20?,\x20?,\x20?)\x0a\x20\x20\x20\x20'),_0x4dcf84=_0x7d9604['run'](_0x400a1e,_0x558076,_0x4993b3,_0x46e9a3,_0x5e11e1);_0xf69121[_0x140223(0x7b)]({'id':_0x4dcf84[_0x140223(0x83)],'brand':_0x400a1e,'longitude':_0x558076,'latitude':_0x4993b3,'city':_0x46e9a3,'drunkAt':_0x5e11e1});}),app[_0x113c27(0x7a)](_0x113c27(0x8e),(_0x35f6df,_0x2b0ebb)=>{const _0x33cd82=_0x113c27,{id:_0x17a814}=_0x35f6df['params'],_0x53f63c=db[_0x33cd82(0x98)]('DELETE\x20FROM\x20beers\x20WHERE\x20id\x20=\x20?'),_0x36d249=_0x53f63c[_0x33cd82(0x93)](_0x17a814);if(_0x36d249['changes']===0x0){_0x2b0ebb[_0x33cd82(0x8d)](0x194)[_0x33cd82(0x7b)]({'error':_0x33cd82(0x8a)+_0x17a814+_0x33cd82(0x7f)});return;}_0x2b0ebb[_0x33cd82(0x7b)]({'id':_0x17a814});}),app[_0x113c27(0x97)](port,()=>console['log'](_0x113c27(0x95)));function _0x3909(){const _0x189b77=['SELECT\x20*\x20FROM\x20beers','77VPVzVc','625605bvhxEe','lastInsertRowid','5303664LilNFG','470nCtOma','./apiKey.json','Missing\x20required\x20fields','get','6xgRwib','Beer\x20with\x20id\x20','/beers','body','status','/beers/:id','promises','express','356072rzdTZY','714489WHkKmV','run','75EYyrfb','Server\x20listening!','\x0a\x20\x20CREATE\x20TABLE\x20IF\x20NOT\x20EXISTS\x20beers\x20(\x0a\x20\x20\x20\x20id\x20INTEGER\x20PRIMARY\x20KEY,\x0a\x20\x20\x20\x20brand\x20TEXT\x20NOT\x20NULL,\x0a\x20\x20\x20\x20longitude\x20REAL\x20NOT\x20NULL,\x0a\x20\x20\x20\x20latitude\x20REAL\x20NOT\x20NULL,\x0a\x20\x20\x20\x20city\x20TEXT\x20NOT\x20NULL,\x0a\x20\x20\x20\x20drunkAt\x20TEXT\x20NOT\x20NULL\x0a\x20\x20)\x0a','listen','prepare','all','delete','json','450108iwsBVE','1070288DScWfa','216623YqaIKZ','\x20not\x20found'];_0x3909=function(){return _0x189b77;};return _0x3909();}
-   
+const db = new sqlite('database.sqlite');
+
+// nohup npm start &
+
+const createBeerTable = db.prepare(`
+  CREATE TABLE IF NOT EXISTS beers (
+    id INTEGER PRIMARY KEY,
+    brand TEXT NOT NULL,
+    longitude REAL NOT NULL,
+    latitude REAL NOT NULL,
+    city TEXT NOT NULL,
+    drunkAt TEXT NOT NULL
+  )
+`);
+createBeerTable.run();
+
+app.get('/status', (req, res) =>{
+    console.log("GET status")
+    res.json({ status: 'ok'});
+});
+
+app.get('/beers', (req, res) => {
+    console.log("GET Beers");
+    const beers = db.prepare('SELECT * FROM beers').all();
+    res.json(beers);
+});
+
+app.post('/beers', express.json(),(req, res) => {
+    console.log("POST a new beer");
+    const { brand, longitude, latitude, city, drunkAt } = req.body;
+    if (!brand || !longitude || !latitude || !city || !drunkAt) {
+        res.status(400).json({ error: 'Missing required fields' });
+        return;
+    }
+    const insertBeer = db.prepare(`
+        INSERT INTO beers (brand, longitude, latitude, city, drunkAt)
+        VALUES (?, ?, ?, ?, ?)
+    `);
+    const info = insertBeer.run(brand, longitude, latitude, city, drunkAt);
+
+    res.json({ id: info.lastInsertRowid, brand, longitude, latitude, city, drunkAt });
+});
+
+app.delete('/beers/:id', (req, res) => {
+    console.log("DELETE a beer");
+    const {id} = req.params;
+    const deleteBeer = db.prepare('DELETE FROM beers WHERE id = ?');
+    const info = deleteBeer.run(id);
+    if (info.changes === 0) {
+        res.status(404).json({error: `Beer with id ${id} not found`});
+        return;
+    }
+    res.json({id});
+});
+
+app.listen(port, () => console.log(`Server listening!`));
