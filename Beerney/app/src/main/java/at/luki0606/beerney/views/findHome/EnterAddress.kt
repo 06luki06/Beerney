@@ -17,12 +17,13 @@ import at.luki0606.beerney.ui.theme.Ebony
 import at.luki0606.beerney.viewModels.findHome.FindHomeViewModel
 
 @Composable
-fun EnterAddress(address: String, viewModel: FindHomeViewModel){
+fun EnterAddress(viewModel: FindHomeViewModel){
     OutlinedTextField(
-        value = address,
+        value = viewModel.address.value,
         label = { Text("Address") },
-        modifier = Modifier.fillMaxWidth()
-            .padding(bottom=8.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 8.dp),
         singleLine = true,
         leadingIcon = { Icon(imageVector = Icons.Rounded.Place, contentDescription = "Home-Address") },
         placeholder = { Text("Enter address") },

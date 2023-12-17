@@ -21,7 +21,6 @@ import kotlin.math.absoluteValue
 fun FindHomeView(viewModel: FindHomeViewModel){
     val bearing by viewModel.bearing
     val currentLocation = viewModel.currentLocation.collectAsState()
-    val address by viewModel.address
     val targetPosition by viewModel.targetPosition.collectAsState()
 
     val currentLoc = Location(LocationManager.GPS_PROVIDER)
@@ -40,7 +39,7 @@ fun FindHomeView(viewModel: FindHomeViewModel){
         ShowLocationValue(key = "Home lat:", value = "${targetPosition.latitude}°")
         ShowLocationValue(key = "Home long:", value = "${targetPosition.longitude}°")
         ShowLocationValue(key = "Bearing:", value = "${bearing.absoluteValue}°")
-        EnterAddress(address = address, viewModel = viewModel)
+        EnterAddress(viewModel = viewModel)
         Spacer(modifier = Modifier.height(25.dp))
         FindHomeBtn(viewModel = viewModel)
         if(targetPosition.latitude != 0.0 && targetPosition.longitude != 0.0){

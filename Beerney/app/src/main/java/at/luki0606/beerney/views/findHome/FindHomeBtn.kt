@@ -13,6 +13,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import at.luki0606.beerney.ui.theme.Alabaster
 import at.luki0606.beerney.viewModels.findHome.FindHomeViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.Locale
 
 @Composable
@@ -23,22 +26,28 @@ fun FindHomeBtn(viewModel: FindHomeViewModel){
 
     Button(
         modifier = Modifier.fillMaxWidth(),
-        enabled = address.isNotEmpty(),
         onClick = {
-            geocoder.getFromLocationName(address, 1) { addresses ->
-                if (addresses.isNotEmpty()) {
-                    viewModel.updateTargetPositionAndBearing(
-                        addresses[0].latitude,
-                        addresses[0].longitude
-                    )
-                } else {
-                    Toast.makeText(context, "Could not found location", Toast.LENGTH_SHORT)
-                        .show()
+            if(address.isEmpty()){
+                CoroutineScope(Dispatchers.Main).launch {
+                    Toast.makeText(context, "Please enter an address", Toast.LENGTH_SHORT).show()
+                }
+            }else{
+                geocoder.getFromLocationName(address, 1) { addresses ->
+                    if (addresses.isNotEmpty()) {
+                        viewModel.updateTargetPositionAndBearing(
+                            addresses[0].latitude,
+                            addresses[0].longitude
+                        )
+                    } else {
+                        CoroutineScope(Dispatchers.Main).launch {
+                            Toast.makeText(context, "Could not find location", Toast.LENGTH_SHORT).show()
+                        }
+                    }
                 }
             }
         }
     ) {
-        Text(text = "FIND HOME!",
+        Text(text = "BEER ME HOME!",
             modifier = Modifier.padding(8.dp),
             color = Alabaster
         )
