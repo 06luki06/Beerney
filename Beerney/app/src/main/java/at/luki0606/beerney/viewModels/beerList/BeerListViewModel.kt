@@ -99,8 +99,7 @@ class BeerListViewModel(application: Application) : AndroidViewModel(application
         _filteredBeerList.value = if (startDateFilter == 0L) {
             _filteredBeerList.value
         } else {
-            val adjustedStartDate = startDateFilter - (24 * 60 * 60 * 1000)
-            _filteredBeerList.value.filter { it.drunkAt.time >= adjustedStartDate }
+            _filteredBeerList.value.filter { it.drunkAt.time >= startDateFilter }
         }
 
         val endDateFilter = _selectedEndDate.longValue

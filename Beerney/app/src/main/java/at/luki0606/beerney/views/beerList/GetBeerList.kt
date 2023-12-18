@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -40,12 +41,13 @@ fun GetBeerList(viewModel: BeerListViewModel){
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(4.dp)
+                    .padding(6.dp)
             ) {
                 Text(text = beer.brand,
                     style = MaterialTheme.typography.headlineMedium,
-                    modifier = Modifier.width(200.dp))
-                Column {
+                    )
+                Column(horizontalAlignment = Alignment.End,
+                    modifier = Modifier.weight(1f)) {
                     Text(text = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(beer.drunkAt),
                         style = MaterialTheme.typography.bodySmall)
                     Text(text = SimpleDateFormat("HH:mm", Locale.getDefault()).format(beer.drunkAt) + " h",
@@ -53,6 +55,7 @@ fun GetBeerList(viewModel: BeerListViewModel){
                     Text(text = beer.city,
                         style = MaterialTheme.typography.bodySmall)
                 }
+                Spacer(modifier = Modifier.width(24.dp))
                 IconButton(
                     onClick = {
                         viewModel.deleteBeer(beer)
