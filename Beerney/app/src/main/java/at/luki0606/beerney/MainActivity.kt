@@ -28,6 +28,7 @@ import androidx.core.location.LocationManagerCompat.isLocationEnabled
 import androidx.lifecycle.lifecycleScope
 import at.luki0606.beerney.models.BeerRepository
 import at.luki0606.beerney.models.CurrentLocation
+import at.luki0606.beerney.models.EstablishConnection
 import at.luki0606.beerney.services.CurrentLocationManager
 import at.luki0606.beerney.ui.theme.Alabaster
 import at.luki0606.beerney.ui.theme.BeerneyTheme
@@ -72,7 +73,7 @@ class MainActivity : ComponentActivity() {
             try {
                 val (_, response, _) = Fuel.get("${ip}/status")
                     .responseString()
-
+                EstablishConnection.getConnection()
                 withContext(Dispatchers.Main) {
                     if (response.statusCode == 200) {
                         Toast.makeText(this@MainActivity, "Connected to server", Toast.LENGTH_SHORT).show()

