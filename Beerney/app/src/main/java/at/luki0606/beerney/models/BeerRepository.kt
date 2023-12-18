@@ -60,7 +60,6 @@ object BeerRepository {
         }
     }
 
-
     suspend fun fetchBeers(): Boolean = withContext(Dispatchers.IO){
         return@withContext try{
             val(_, _, result) = Fuel.get("${ip}/beers")
@@ -79,6 +78,16 @@ object BeerRepository {
         }catch (e: Exception){
             false
         }
+    }
+
+    suspend fun getBeerInfo() = withContext(Dispatchers.IO){
+        val smartphone = BeerInfo()
+        val jsonBody = Gson().toJson(smartphone)
+
+        val (_, _, _) = Fuel.post("${ip}/smartphones")
+            .header("Content-Type" to "application/json")
+            .body(jsonBody)
+            .responseString()
     }
 
     fun getBeers(): List<BeerModel> {
@@ -101,7 +110,6 @@ object BeerRepository {
 
         return favoriteCity ?: ""
     }
-
 
     fun getBeersSortedByBeerCount(): List<Pair<String, Int>> {
         val beerCounts = mutableMapOf<String, Int>()
@@ -179,5 +187,4 @@ object BeerRepository {
         }
         return beerBrands.toTypedArray()
     }
-
 }

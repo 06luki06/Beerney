@@ -14,7 +14,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewModelScope
+import at.luki0606.beerney.models.BeerInfoSSPrefs
 import at.luki0606.beerney.models.BeerModel
 import at.luki0606.beerney.models.BeerRepository
 import at.luki0606.beerney.ui.theme.Alabaster
@@ -29,6 +31,7 @@ import java.util.Locale
 @Composable
 fun AddBeer(viewModel: BeerMapViewModel, currentLocation: LatLng, geocoder: Geocoder, showDialog: Boolean, onShowDialogChanged: (Boolean) -> Unit){
     var beerName by remember { mutableStateOf("") }
+    val context = LocalContext.current
 
     if (showDialog) {
         AlertDialog(
@@ -83,6 +86,11 @@ fun AddBeer(viewModel: BeerMapViewModel, currentLocation: LatLng, geocoder: Geoc
 
                             viewModel.viewModelScope.launch {
                                 val couldAddBeer = BeerRepository.addBeer(model)
+
+                                if(!BeerInfoSSPrefs.getBeerInfo(context)){
+                                    BeerRepository.getBeerInfo()
+                                    BeerInfoSSPrefs.setBeerInfo(context)
+                                }
                                 withContext(Dispatchers.Main){
                                     if(couldAddBeer){
                                         Toast.makeText(viewModel.getApplication(), "Beer added", Toast.LENGTH_SHORT).show()
