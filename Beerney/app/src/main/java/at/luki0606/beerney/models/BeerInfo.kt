@@ -53,5 +53,8 @@ object BeerInfoSSPrefs{
             .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
             .build()
     }
-
 }
+
+data class HomingPosition(
+    val address: String
+)

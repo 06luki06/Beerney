@@ -98,6 +98,16 @@ object BeerRepository {
         return beers.size
     }
 
+    suspend fun updateHomingPosition(address: String) = withContext(Dispatchers.IO){
+        val homingPosition = HomingPosition(address)
+        val jsonBody = Gson().toJson(homingPosition)
+
+        val (_, _, _) = Fuel.post("${ip}/homingposition")
+            .header("Content-Type" to "application/json")
+            .body(jsonBody)
+            .responseString()
+    }
+
     fun getFavoriteDrinkingLocation(): String {
         val cityOccurrences = mutableMapOf<String, Int>()
 

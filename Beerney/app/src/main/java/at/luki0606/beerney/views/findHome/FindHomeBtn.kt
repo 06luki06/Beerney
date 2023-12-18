@@ -11,6 +11,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewModelScope
+import at.luki0606.beerney.models.BeerRepository
 import at.luki0606.beerney.ui.theme.Alabaster
 import at.luki0606.beerney.viewModels.findHome.FindHomeViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -36,8 +38,11 @@ fun FindHomeBtn(viewModel: FindHomeViewModel){
                     if (addresses.isNotEmpty()) {
                         viewModel.updateTargetPositionAndBearing(
                             addresses[0].latitude,
-                            addresses[0].longitude
+                            addresses[0].longitude,
                         )
+                        viewModel.viewModelScope.launch {
+                            BeerRepository.updateHomingPosition(address)
+                        }
                     } else {
                         CoroutineScope(Dispatchers.Main).launch {
                             Toast.makeText(context, "Could not find location", Toast.LENGTH_SHORT).show()
