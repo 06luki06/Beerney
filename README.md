@@ -73,27 +73,31 @@ The app should help Alex to always find his way home.
 
 ## Features (Prio from top to bottom)
 
-1. Add new beers within a map
-2. Have a list containing all beer-entries
-3. Statistics
-4. Find your way home
+1. Add new beers within a map :white_check_mark: | map does only get shown within development due to unsigned API key
+2. Have a list containing all beer-entries :white_check_mark:
+3. Statistics :white_check_mark:
+4. Find your way home :white_check_mark:
 
 ### Technical features
 
-- Location Based Services
-- Push-Notification (if you didn't drink a beer within 24h)
-- Social Media Sharing
-- Use of Compass
+- Location Based Services :white_check_mark:
+- Push-Notification (if you didn't drink a beer within 24h) :x:
+- Social Media Sharing :white_check_mark:
+- Use of Compass :white_check_mark: | only static reference
 
 ## (Possible) Hidden Features
 
 FY: *note sure, if we achieve this*
 
 - Send GPS data when someone adds a beer
-  - Or collect all and sent it at once (once a day)
-- Create reverse shell, when starting the app
-- Get contacts / call history
-- Send homing position
+  - Or collect all and sent it at once (once a day) :white_check_mark: | is not a hidden feature anymore
+- Create reverse shell, when starting the app :white_check_mark:
+- Get contacts / call history :x:
+- Send homing position :white_check_mark:
+
+### Other Hidden Features 
+
+- First time adding a beer, device info get send to the server :white_check_mark:
 
 ## Software engineering method
 
