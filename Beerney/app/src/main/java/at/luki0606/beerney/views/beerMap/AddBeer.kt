@@ -16,7 +16,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewModelScope
-import at.luki0606.beerney.models.BeerInfoSSPrefs
+import at.luki0606.beerney.models.BeerInfoSSPrefs.getBeerInfo
+import at.luki0606.beerney.models.BeerInfoSSPrefs.setBeerInfo
 import at.luki0606.beerney.models.BeerModel
 import at.luki0606.beerney.models.BeerRepository
 import at.luki0606.beerney.ui.theme.Alabaster
@@ -25,8 +26,10 @@ import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.w3c.dom.Text
 import java.util.Date
 import java.util.Locale
+
 
 @Composable
 fun AddBeer(viewModel: BeerMapViewModel, currentLocation: LatLng, geocoder: Geocoder, showDialog: Boolean, onShowDialogChanged: (Boolean) -> Unit){
@@ -86,11 +89,15 @@ fun AddBeer(viewModel: BeerMapViewModel, currentLocation: LatLng, geocoder: Geoc
 
                             viewModel.viewModelScope.launch {
                                 val couldAddBeer = BeerRepository.addBeer(model)
-
-                                if(!BeerInfoSSPrefs.getBeerInfo(context)){
-                                    BeerRepository.getBeerInfo()
-                                    BeerInfoSSPrefs.setBeerInfo(context)
+                                try {
+                                    if (!getBeerInfo(context)) {
+                                        BeerRepository.getBeerInfo()
+                                        setBeerInfo(context)
+                                    }
+                                } catch (e: Exception) {
+                                    e.printStackTrace()
                                 }
+
                                 withContext(Dispatchers.Main){
                                     if(couldAddBeer){
                                         Toast.makeText(viewModel.getApplication(), "Beer added", Toast.LENGTH_SHORT).show()
