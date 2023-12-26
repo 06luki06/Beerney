@@ -36,10 +36,9 @@ fun ShowStatistics() {
             key = "Favorite location",
             value = BeerRepository.getFavoriteDrinkingLocation()
         )
-        //shows infinity
         ShowSingleStatistic(
             key = "Avg. beer / day",
-            value = BeerRepository.getAvgBeerPerDay().toString()
+            value = ("%.2f".format(BeerRepository.getAvgBeerPerDay()))
         )
     }
 }
